@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/views/login_page.dart';
+import '../../features/auth/presentation/views/register_page.dart';
+import '../../features/auth/presentation/views/forgot_password_page.dart';
 import '../../features/home/presentation/views/home_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
   static const String home = '/home';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -11,6 +15,16 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(
           builder: (_) => const LoginPage(),
+          settings: settings,
+        );
+      case register:
+        return MaterialPageRoute(
+          builder: (_) => const RegisterPage(),
+          settings: settings,
+        );
+      case forgotPassword:
+        return MaterialPageRoute(
+          builder: (_) => const ForgotPasswordPage(),
           settings: settings,
         );
       case home:

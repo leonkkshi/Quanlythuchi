@@ -2,22 +2,24 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
-import '../viewmodels/login_view_model.dart';
+import '../viewmodels/forgot_password_view_model.dart';
 import '../../../../app/routes/app_routes.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -26,7 +28,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     super.initState();
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1000),
     );
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
@@ -39,19 +41,45 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _fadeController.dispose();
     super.dispose();
   }
 
-  void _submit(LoginViewModel viewModel) async {
+  void _submit(ForgotPasswordViewModel viewModel) async {
     if (_formKey.currentState!.validate()) {
-      final success = await viewModel.login(
+      final success = await viewModel.resetPassword(
         _emailController.text,
         _passwordController.text,
+        _confirmPasswordController.text,
       );
       if (success && mounted) {
-        // Redirect to home screen and clear route stack
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        // Show success dialog
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: Colors.green),
+                SizedBox(width: 8),
+                Text('Thành công'),
+              ],
+            ),
+            content: const Text('Mật khẩu của bạn đã được cập nhật thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Đồng ý'),
+              ),
+            ],
+          ),
+        );
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+        }
       }
     }
   }
@@ -62,11 +90,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
 
-    return ChangeNotifierProvider<LoginViewModel>(
-      create: (context) => LoginViewModel(
+    return ChangeNotifierProvider<ForgotPasswordViewModel>(
+      create: (context) => ForgotPasswordViewModel(
         authService: Provider.of<AuthServiceImpl>(context, listen: false),
       ),
-      child: Consumer<LoginViewModel>(
+      child: Consumer<ForgotPasswordViewModel>(
         builder: (context, viewModel, child) {
           // Listen to error updates and show SnackBar
           if (viewModel.errorMessage != null) {
@@ -92,13 +120,13 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                     color: isDark ? const Color(0xFF020617) : const Color(0xFFF1F5F9),
                   ),
                 ),
-                // Glowing circle top-left (Indigo/Purple)
+                // Glowing circle top-center (Indigo/Purple)
                 Positioned(
-                  top: -100,
-                  left: -100,
+                  top: -120,
+                  left: MediaQuery.of(context).size.width / 4,
                   child: Container(
-                    width: 300,
-                    height: 300,
+                    width: 320,
+                    height: 320,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: primaryColor.withOpacity(isDark ? 0.12 : 0.08),
@@ -131,7 +159,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 SafeArea(
                   child: Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                       child: FadeTransition(
                         opacity: _fadeAnimation,
                         child: Form(
@@ -140,10 +168,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Top Brand Header
+                              // Small Header icon
                               Center(
                                 child: Container(
-                                  padding: const EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [primaryColor, secondaryColor],
@@ -151,43 +179,36 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       end: Alignment.bottomRight,
                                     ),
                                     shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: primaryColor.withOpacity(0.3),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 10),
-                                      ),
-                                    ],
                                   ),
                                   child: const Icon(
-                                    Icons.account_balance_wallet_rounded,
-                                    size: 44,
+                                    Icons.lock_reset_rounded,
+                                    size: 32,
                                     color: Colors.white,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
                               Text(
-                                'QUẢN LÝ THU CHI',
+                                'QUÊN MẬT KHẨU',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 24,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1.5,
                                   color: isDark ? Colors.white : const Color(0xFF1E293B),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 6),
                               Text(
-                                'Kiểm soát tài chính, kiến tạo tương lai',
+                                'Nhập email và mật khẩu mới để thiết lập lại tài khoản',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                 ),
                               ),
-                              const SizedBox(height: 40),
+                              const SizedBox(height: 28),
 
                               // Glassmorphic Card Container
                               ClipRRect(
@@ -212,14 +233,14 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
                                         Text(
-                                          'Đăng nhập tài khoản',
+                                          'Đặt lại mật khẩu',
                                           style: TextStyle(
-                                            fontSize: 18,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                             color: isDark ? Colors.white : const Color(0xFF1E293B),
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
+                                        const SizedBox(height: 16),
 
                                         // Email Input
                                         TextFormField(
@@ -227,8 +248,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                           keyboardType: TextInputType.emailAddress,
                                           enabled: !viewModel.isLoading,
                                           decoration: const InputDecoration(
-                                            labelText: 'Email',
-                                            hintText: 'Nhập email của bạn',
+                                            labelText: 'Email tài khoản',
+                                            hintText: 'Nhập email cần đặt lại',
                                             prefixIcon: Icon(Icons.email_outlined),
                                           ),
                                           validator: (value) {
@@ -246,8 +267,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                           obscureText: _obscurePassword,
                                           enabled: !viewModel.isLoading,
                                           decoration: InputDecoration(
-                                            labelText: 'Mật khẩu',
-                                            hintText: 'Nhập mật khẩu',
+                                            labelText: 'Mật khẩu mới',
+                                            hintText: 'Nhập mật khẩu mới (tối thiểu 6 ký tự)',
                                             prefixIcon: const Icon(Icons.lock_outline_rounded),
                                             suffixIcon: IconButton(
                                               icon: Icon(
@@ -264,36 +285,51 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                           ),
                                           validator: (value) {
                                             if (value == null || value.trim().isEmpty) {
-                                              return 'Vui lòng nhập mật khẩu';
+                                              return 'Vui lòng nhập mật khẩu mới';
+                                            }
+                                            if (value.length < 6) {
+                                              return 'Mật khẩu mới phải chứa ít nhất 6 ký tự';
                                             }
                                             return null;
                                           },
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: 16),
 
-                                        // Forgot password (mock text)
-                                         Align(
-                                           alignment: Alignment.centerRight,
-                                           child: TextButton(
-                                             onPressed: () {
-                                               Navigator.pushNamed(context, AppRoutes.forgotPassword);
-                                             },
-                                             style: TextButton.styleFrom(
-                                               padding: EdgeInsets.zero,
-                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                             ),
-                                             child: Text(
-                                              'Quên mật khẩu?',
-                                              style: TextStyle(
-                                                color: primaryColor,
-                                                fontWeight: FontWeight.w600,
+                                        // Confirm Password Input
+                                        TextFormField(
+                                          controller: _confirmPasswordController,
+                                          obscureText: _obscureConfirmPassword,
+                                          enabled: !viewModel.isLoading,
+                                          decoration: InputDecoration(
+                                            labelText: 'Xác nhận mật khẩu mới',
+                                            hintText: 'Nhập lại mật khẩu mới',
+                                            prefixIcon: const Icon(Icons.lock_reset_rounded),
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                _obscureConfirmPassword
+                                                    ? Icons.visibility_off_outlined
+                                                    : Icons.visibility_outlined,
                                               ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                                                });
+                                              },
                                             ),
                                           ),
+                                          validator: (value) {
+                                            if (value == null || value.trim().isEmpty) {
+                                              return 'Vui lòng xác nhận mật khẩu mới';
+                                            }
+                                            if (value != _passwordController.text) {
+                                              return 'Mật khẩu xác nhận không khớp';
+                                            }
+                                            return null;
+                                          },
                                         ),
                                         const SizedBox(height: 24),
 
-                                        // Submit button with loading state
+                                        // Submit button
                                         ElevatedButton(
                                           onPressed: viewModel.isLoading ? null : () => _submit(viewModel),
                                           child: viewModel.isLoading
@@ -305,7 +341,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                                     strokeWidth: 2.5,
                                                   ),
                                                 )
-                                              : const Text('ĐĂNG NHẬP'),
+                                              : const Text('ĐẶT LẠI MẬT KHẨU'),
                                         ),
                                       ],
                                     ),
@@ -315,80 +351,30 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
 
                               const SizedBox(height: 24),
 
-                              // 3. Helper Widget demonstrating mock credentials
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF1E293B).withOpacity(0.4)
-                                        : const Color(0xFFE2E8F0).withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? const Color(0xFF334155).withOpacity(0.3)
-                                          : const Color(0xFFCBD5E1).withOpacity(0.4),
+                              // Back to Login Prompt
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Quay lại ',
+                                    style: TextStyle(
+                                      color: isDark ? Colors.grey[400] : Colors.grey[600],
                                     ),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.info_outline_rounded,
-                                            size: 18,
-                                            color: primaryColor,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            'Tài khoản demo:',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                              color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                            ),
-                                          ),
-                                        ],
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                                    },
+                                    child: Text(
+                                      'Đăng nhập',
+                                      style: TextStyle(
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      const SizedBox(height: 8),
-                                      const SelectableText(
-                                        'Email: admin@example.com\nMật khẩu: password123',
-                                        style: TextStyle(
-                                          fontFamily: 'monospace',
-                                          fontSize: 12,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                               const SizedBox(height: 24),
-                               Row(
-                                 mainAxisAlignment: MainAxisAlignment.center,
-                                 children: [
-                                   Text(
-                                     'Chưa có tài khoản? ',
-                                     style: TextStyle(
-                                       color: isDark ? Colors.grey[400] : Colors.grey[600],
-                                     ),
-                                   ),
-                                   GestureDetector(
-                                     onTap: () {
-                                       Navigator.pushNamed(context, AppRoutes.register);
-                                     },
-                                     child: Text(
-                                       'Đăng ký ngay',
-                                       style: TextStyle(
-                                         color: primaryColor,
-                                         fontWeight: FontWeight.bold,
-                                       ),
-                                     ),
-                                   ),
-                                 ],
-                               ),
                             ],
                           ),
                         ),

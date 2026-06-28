@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../database/database_helper.dart';
 import '../errors/app_exception.dart';
 
 class ApiClient {
@@ -69,45 +70,120 @@ class ApiClient {
 
   // --- MOCK SIMULATION FOR DEMO ---
   Future<Map<String, dynamic>> _simulateMockPost(String path, Map<String, dynamic>? body) async {
-    await Future.delayed(const Duration(milliseconds: 1500)); // Simulate network latency
+    await Future.delayed(const Duration(milliseconds: 1000)); // Simulate network latency
 
     if (path.endsWith('/auth/login')) {
       final email = body?['email'] as String?;
       final password = body?['password'] as String?;
 
-      if (email == 'admin@example.com' && password == 'password123') {
+      if (email == null || password == null) {
+        throw InvalidInputException('Email và mật khẩu không được để trống.');
+      }
+
+      final user = await DatabaseHelper.instance.getUserByEmail(email);
+      if (user != null && user['password'] == password) {
         return {
-          'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mockToken123',
+          'token': 'mockToken_${user['id']}',
           'user': {
-            'id': 'u-001',
-            'name': 'Nguyễn Văn Minh',
-            'email': 'admin@example.com',
-            'avatarUrl': 'https://api.dicebear.com/7.x/adventurer/svg?seed=Minh',
+            'id': user['id'],
+            'name': user['name'],
+            'email': user['email'],
+            'avatarUrl': user['avatarUrl'],
           }
         };
       } else {
         throw UnauthorizedException('Tên đăng nhập hoặc mật khẩu không chính xác.');
       }
     }
+
+    if (path.endsWith('/auth/register')) {
+      final name = body?['name'] as String?;
+      final email = body?['email'] as String?;
+      final password = body?['password'] as String?;
+
+      if (name == null || email == null || password == null) {
+        throw InvalidInputException('Thông tin đăng ký không hợp lệ.');
+      }
+
+      final exists = await DatabaseHelper.instance.checkUserExists(email);
+      if (exists) {
+        throw InvalidInputException('Email đã được đăng ký bởi tài khoản khác.');
+      }
+
+      final id = 'u_${DateTime.now().millisecondsSinceEpoch}';
+      final avatarUrl = 'https://api.dicebear.com/7.x/adventurer/svg?seed=${Uri.encodeComponent(name)}';
+
+      final newUser = {
+        'id': id,
+        'name': name,
+        'email': email.toLowerCase().trim(),
+        'password': password,
+        'avatarUrl': avatarUrl,
+      };
+
+      await DatabaseHelper.instance.insertUser(newUser);
+
+      return {
+        'token': 'mockToken_$id',
+        'user': {
+          'id': id,
+          'name': name,
+          'email': email,
+          'avatarUrl': avatarUrl,
+        }
+      };
+    }
+
+    if (path.endsWith('/auth/forgot-password')) {
+      final email = body?['email'] as String?;
+      final newPassword = body?['password'] as String?;
+
+      if (email == null || newPassword == null) {
+        throw InvalidInputException('Thông tin đặt lại mật khẩu không hợp lệ.');
+      }
+
+      final exists = await DatabaseHelper.instance.checkUserExists(email);
+      if (!exists) {
+        throw InvalidInputException('Email không tồn tại trong hệ thống.');
+      }
+
+      await DatabaseHelper.instance.updatePassword(email, newPassword);
+
+      return {
+        'success': true,
+        'message': 'Đổi mật khẩu thành công.'
+      };
+    }
     
     throw ServerException('Endpoint mock not implemented.');
   }
 
   Future<Map<String, dynamic>> _simulateMockGet(String path, Map<String, String>? headers) async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     final token = headers?['Authorization'];
-    if (token == null || !token.contains('mockToken123')) {
-      throw UnauthorizedException('Invalid or missing authentication token.');
+    if (token == null) {
+      throw UnauthorizedException('Phiên đăng nhập không hợp lệ.');
     }
 
+    final index = token.indexOf('mockToken_');
+    if (index == -1) {
+      throw UnauthorizedException('Token không hợp lệ.');
+    }
+    final userId = token.substring(index + 'mockToken_'.length).trim();
+
     if (path.endsWith('/auth/profile')) {
-      return {
-        'id': 'u-001',
-        'name': 'Nguyễn Văn Minh',
-        'email': 'admin@example.com',
-        'avatarUrl': 'https://api.dicebear.com/7.x/adventurer/svg?seed=Minh',
-      };
+      final user = await DatabaseHelper.instance.getUserById(userId);
+      if (user != null) {
+        return {
+          'id': user['id'],
+          'name': user['name'],
+          'email': user['email'],
+          'avatarUrl': user['avatarUrl'],
+        };
+      } else {
+        throw UnauthorizedException('Không tìm thấy tài khoản người dùng.');
+      }
     }
 
     throw ServerException('Endpoint mock not implemented.');

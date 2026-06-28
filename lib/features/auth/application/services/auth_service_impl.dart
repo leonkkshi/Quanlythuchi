@@ -26,4 +26,14 @@ class AuthServiceImpl implements IAuthService {
   Future<bool> checkAuthStatus() async {
     return _authRepository.isAuthenticated();
   }
+
+  @override
+  Future<User> register(String name, String email, String password) async {
+    return _authRepository.register(name, email, password);
+  }
+
+  @override
+  Future<void> forgotPassword(String email, String newPassword) async {
+    await _authRepository.forgotPassword(email, newPassword);
+  }
 }

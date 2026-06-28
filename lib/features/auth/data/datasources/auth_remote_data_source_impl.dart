@@ -25,4 +25,28 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
       headers: {'Authorization': 'Bearer $token'},
     );
   }
+
+  @override
+  Future<LoginResponseDto> register(String name, String email, String password) async {
+    final response = await _apiClient.post(
+      ApiConstants.register,
+      body: {
+        'name': name,
+        'email': email,
+        'password': password,
+      },
+    );
+    return LoginResponseDto.fromJson(response);
+  }
+
+  @override
+  Future<void> forgotPassword(String email, String newPassword) async {
+    await _apiClient.post(
+      ApiConstants.forgotPassword,
+      body: {
+        'email': email,
+        'password': newPassword,
+      },
+    );
+  }
 }

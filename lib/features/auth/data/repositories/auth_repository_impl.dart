@@ -62,4 +62,17 @@ class AuthRepositoryImpl implements IAuthRepository {
     final token = await _localDataSource.getToken();
     return token != null && token.isNotEmpty;
   }
+
+  @override
+  Future<User> register(String name, String email, String password) async {
+    final responseDto = await _remoteDataSource.register(name, email, password);
+    await _localDataSource.saveToken(responseDto.token);
+    await _localDataSource.saveUser(responseDto.user);
+    return _userMapper.toEntity(responseDto.user);
+  }
+
+  @override
+  Future<void> forgotPassword(String email, String newPassword) async {
+    await _remoteDataSource.forgotPassword(email, newPassword);
+  }
 }
