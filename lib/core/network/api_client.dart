@@ -111,7 +111,7 @@ class ApiClient {
       }
 
       final id = 'u_${DateTime.now().millisecondsSinceEpoch}';
-      final avatarUrl = 'https://api.dicebear.com/7.x/adventurer/svg?seed=${Uri.encodeComponent(name)}';
+      final avatarUrl = 'https://api.dicebear.com/7.x/adventurer/png?seed=${Uri.encodeComponent(name)}';
 
       final newUser = {
         'id': id,
@@ -122,6 +122,7 @@ class ApiClient {
       };
 
       await DatabaseHelper.instance.insertUser(newUser);
+      await DatabaseHelper.instance.seedDefaultCategoriesForUser(id);
 
       return {
         'token': 'mockToken_$id',
