@@ -5,6 +5,10 @@ import '../features/auth/data/datasources/auth_local_data_source_impl.dart';
 import '../features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/application/services/auth_service_impl.dart';
+import '../features/category/application/providers/category_provider.dart';
+import '../features/category/application/providers/budget_provider.dart';
+import '../features/transaction/application/providers/transaction_provider.dart';
+import '../core/theme/theme_provider.dart';
 import 'routes/app_routes.dart';
 
 class MyApp extends StatelessWidget {
@@ -38,8 +42,22 @@ class MyApp extends StatelessWidget {
         ProxyProvider<AuthRepositoryImpl, AuthServiceImpl>(
           update: (_, repository, __) => AuthServiceImpl(authRepository: repository),
         ),
+        ChangeNotifierProvider<CategoryProvider>(
+          create: (_) => CategoryProvider(),
+        ),
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (_) => ThemeProvider(),
+        ),
+        ChangeNotifierProvider<BudgetProvider>(
+          create: (_) => BudgetProvider(),
+        ),
+        ChangeNotifierProvider<TransactionProvider>(
+          create: (_) => TransactionProvider(),
+        ),
       ],
-      child: MaterialApp(
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
         title: 'Quản Lý Thu Chi',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -176,9 +194,11 @@ class MyApp extends StatelessWidget {
             hintStyle: const TextStyle(color: Color(0xFF64748B)),
           ),
         ),
-        themeMode: ThemeMode.system, // Dynamically adapts to system settings
-        initialRoute: initialRoute ?? AppRoutes.login,
-        onGenerateRoute: AppRoutes.onGenerateRoute,
+            themeMode: themeProvider.themeMode,
+            initialRoute: initialRoute ?? AppRoutes.login,
+            onGenerateRoute: AppRoutes.onGenerateRoute,
+          );
+        },
       ),
     );
   }
