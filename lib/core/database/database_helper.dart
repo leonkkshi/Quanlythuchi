@@ -252,7 +252,11 @@ class DatabaseHelper {
 
     final batch = db.batch();
     for (var cat in defaultCategories) {
-      batch.insert('categories', cat, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(
+        'categories',
+        cat,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
     }
     await batch.commit(noResult: true);
   }
@@ -323,7 +327,9 @@ class DatabaseHelper {
   }
 
   // --- CATEGORIES OPERATIONS ---
-  Future<List<Map<String, dynamic>>> getCategoriesByUserId(String userId) async {
+  Future<List<Map<String, dynamic>>> getCategoriesByUserId(
+    String userId,
+  ) async {
     final db = await instance.database;
     return await db.query(
       'categories',
@@ -343,15 +349,13 @@ class DatabaseHelper {
 
   Future<int> deleteCategory(String id) async {
     final db = await instance.database;
-    return await db.delete(
-      'categories',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('categories', where: 'id = ?', whereArgs: [id]);
   }
 
   // --- TRANSACTIONS OPERATIONS ---
-  Future<List<Map<String, dynamic>>> getTransactionsByUserId(String userId) async {
+  Future<List<Map<String, dynamic>>> getTransactionsByUserId(
+    String userId,
+  ) async {
     final db = await instance.database;
     return await db.query(
       'transactions',
@@ -372,14 +376,14 @@ class DatabaseHelper {
 
   Future<int> deleteTransaction(String id) async {
     final db = await instance.database;
-    return await db.delete(
-      'transactions',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('transactions', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> updateUserProfile(String id, String name, String avatarUrl) async {
+  Future<int> updateUserProfile(
+    String id,
+    String name,
+    String avatarUrl,
+  ) async {
     final db = await instance.database;
     return await db.update(
       'users',
@@ -394,5 +398,19 @@ class DatabaseHelper {
     if (db != null) {
       await db.close();
     }
+  }
+
+  Future<int> updateTransaction(
+    String id,
+    Map<String, dynamic> transactionData,
+  ) async {
+    final db = await database;
+
+    return await db.update(
+      'transactions',
+      transactionData,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }
