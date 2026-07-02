@@ -7,6 +7,7 @@ import '../../../../app/routes/app_routes.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../../../core/database/database_helper.dart';
 import '../../../../core/theme/theme_provider.dart';
+import 'home_page.dart';
 import '../../../transaction/presentation/views/transaction_input_view.dart';
 import '../../../transaction/presentation/views/transaction_calendar_view.dart';
 import '../../../transaction/presentation/views/transaction_report_view.dart';
@@ -23,19 +24,26 @@ class MainNavigationShell extends StatefulWidget {
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
 
-
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     _pages = [
+      HomePage(onNavigateToTab: _changeTab),
       const TransactionInputView(),
       const TransactionCalendarView(),
       const TransactionReportView(),
       const BudgetView(),
       const _SettingsTab(),
     ];
+  }
+
+  void _changeTab(int index) {
+    if (index < 0 || index >= _pages.length) return;
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -45,10 +53,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     final primaryColor = Colors.orange[800] ?? Colors.orange;
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -69,11 +74,24 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           type: BottomNavigationBarType.fixed,
           backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
           selectedItemColor: primaryColor,
-          unselectedItemColor: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+          unselectedItemColor: isDark
+              ? const Color(0xFF64748B)
+              : const Color(0xFF94A3B8),
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
           elevation: 0,
           items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined, size: 24),
+              activeIcon: Icon(Icons.dashboard_rounded, size: 24),
+              label: 'Tổng quan',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.edit_note_rounded, size: 28),
               activeIcon: Icon(Icons.edit_note_rounded, size: 28),
@@ -106,8 +124,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   }
 }
 
-
-
 class _SettingsTab extends StatefulWidget {
   const _SettingsTab();
 
@@ -137,7 +153,11 @@ class _SettingsTabState extends State<_SettingsTab> {
     final authService = Provider.of<AuthServiceImpl>(context, listen: false);
     await authService.logout();
     if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
     }
   }
 
@@ -169,16 +189,17 @@ class _SettingsTabState extends State<_SettingsTab> {
         final isDark = theme.brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-          title: const Text('Thiết lập mã PIN 4 số', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: const Text(
+            'Thiết lập mã PIN 4 số',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.number,
             maxLength: 4,
             obscureText: true,
             autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Nhập 4 số PIN',
-            ),
+            decoration: const InputDecoration(hintText: 'Nhập 4 số PIN'),
           ),
           actions: [
             TextButton(
@@ -203,11 +224,15 @@ class _SettingsTabState extends State<_SettingsTab> {
                     _pinEnabled = true;
                   });
                   scaffoldMessenger.showSnackBar(
-                    const SnackBar(content: Text('Đã kích hoạt khóa PIN thành công!')),
+                    const SnackBar(
+                      content: Text('Đã kích hoạt khóa PIN thành công!'),
+                    ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Mã PIN phải gồm đúng 4 chữ số!')),
+                    const SnackBar(
+                      content: Text('Mã PIN phải gồm đúng 4 chữ số!'),
+                    ),
                   );
                 }
               },
@@ -223,7 +248,7 @@ class _SettingsTabState extends State<_SettingsTab> {
     final txProvider = Provider.of<TransactionProvider>(context, listen: false);
     final txs = txProvider.transactions;
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    
+
     if (txs.isEmpty) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(content: Text('Không có dữ liệu giao dịch để xuất!')),
@@ -235,7 +260,9 @@ class _SettingsTabState extends State<_SettingsTab> {
       final csvBuffer = StringBuffer();
       csvBuffer.writeln('Mã giao dịch,Số tiền,Ngày,Loại,Ghi chú,Mã danh mục');
       for (final tx in txs) {
-        csvBuffer.writeln('${tx.id},${tx.amount},${tx.date},${tx.type},"${tx.note ?? ''}",${tx.categoryId}');
+        csvBuffer.writeln(
+          '${tx.id},${tx.amount},${tx.date},${tx.type},"${tx.note ?? ''}",${tx.categoryId}',
+        );
       }
 
       final directory = Directory('csv_exports');
@@ -247,7 +274,9 @@ class _SettingsTabState extends State<_SettingsTab> {
 
       scaffoldMessenger.showSnackBar(
         const SnackBar(
-          content: Text('Đã xuất CSV thành công tại: csv_exports/transactions_export.csv'),
+          content: Text(
+            'Đã xuất CSV thành công tại: csv_exports/transactions_export.csv',
+          ),
           duration: Duration(seconds: 4),
         ),
       );
@@ -258,15 +287,18 @@ class _SettingsTabState extends State<_SettingsTab> {
     }
   }
 
-  void _showEditProfileBottomSheet(String currentName, String currentAvatarUrl) {
+  void _showEditProfileBottomSheet(
+    String currentName,
+    String currentAvatarUrl,
+  ) {
     final nameController = TextEditingController(text: currentName);
-    
+
     String currentSeed = currentName;
     try {
       final uri = Uri.parse(currentAvatarUrl);
       currentSeed = uri.queryParameters['seed'] ?? currentName;
     } catch (_) {}
-    
+
     final seedController = TextEditingController(text: currentSeed);
 
     showModalBottomSheet(
@@ -308,7 +340,9 @@ class _SettingsTabState extends State<_SettingsTab> {
                   labelText: 'Tên người dùng',
                   hintText: 'Nhập tên của bạn',
                 ),
-                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -317,14 +351,18 @@ class _SettingsTabState extends State<_SettingsTab> {
                   labelText: 'Từ khóa ảnh đại diện (Seed)',
                   hintText: 'Nhập từ khóa tạo avatar',
                 ),
-                style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange[800] ?? Colors.orange,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () async {
                   final newName = nameController.text.trim();
@@ -334,34 +372,54 @@ class _SettingsTabState extends State<_SettingsTab> {
 
                   if (newName.isEmpty || newSeed.isEmpty) {
                     scaffoldMessenger.showSnackBar(
-                      const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin!')),
+                      const SnackBar(
+                        content: Text('Vui lòng điền đầy đủ thông tin!'),
+                      ),
                     );
                     return;
                   }
 
-                  final authService = Provider.of<AuthServiceImpl>(context, listen: false);
+                  final authService = Provider.of<AuthServiceImpl>(
+                    context,
+                    listen: false,
+                  );
                   final user = await authService.getCurrentUser();
                   if (user != null) {
-                    final newAvatarUrl = 'https://api.dicebear.com/7.x/adventurer/png?seed=${Uri.encodeComponent(newSeed)}';
-                    await DatabaseHelper.instance.updateUserProfile(user.id, newName, newAvatarUrl);
-                    
+                    final newAvatarUrl =
+                        'https://api.dicebear.com/7.x/adventurer/png?seed=${Uri.encodeComponent(newSeed)}';
+                    await DatabaseHelper.instance.updateUserProfile(
+                      user.id,
+                      newName,
+                      newAvatarUrl,
+                    );
+
                     final prefs = await SharedPreferences.getInstance();
                     final userJson = prefs.getString('auth_user');
                     if (userJson != null) {
-                      final Map<String, dynamic> userData = json.decode(userJson);
+                      final Map<String, dynamic> userData = json.decode(
+                        userJson,
+                      );
                       userData['name'] = newName;
                       userData['avatarUrl'] = newAvatarUrl;
                       await prefs.setString('auth_user', json.encode(userData));
                     }
-                    
+
                     navigator.pop();
                     setState(() {});
                     scaffoldMessenger.showSnackBar(
-                      const SnackBar(content: Text('Đã cập nhật thông tin cá nhân!')),
+                      const SnackBar(
+                        content: Text('Đã cập nhật thông tin cá nhân!'),
+                      ),
                     );
                   }
                 },
-                child: const Text('LƯU THAY ĐỔI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'LƯU THAY ĐỔI',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -377,9 +435,14 @@ class _SettingsTabState extends State<_SettingsTab> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF020617) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark
+          ? const Color(0xFF020617)
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Cài Đặt', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Cài Đặt',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -390,7 +453,9 @@ class _SettingsTabState extends State<_SettingsTab> {
           final user = snapshot.data;
           final userName = user?.name ?? 'Người dùng';
           final userEmail = user?.email ?? 'Chưa cập nhật email';
-          final avatarUrl = user?.avatarUrl ?? 'https://api.dicebear.com/7.x/adventurer/png?seed=Default';
+          final avatarUrl =
+              user?.avatarUrl ??
+              'https://api.dicebear.com/7.x/adventurer/png?seed=Default';
 
           return ListView(
             padding: const EdgeInsets.all(16.0),
@@ -399,7 +464,9 @@ class _SettingsTabState extends State<_SettingsTab> {
                 onTap: () => _showEditProfileBottomSheet(userName, avatarUrl),
                 borderRadius: BorderRadius.circular(16),
                 child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   color: isDark ? const Color(0xFF0F172A) : Colors.white,
                   elevation: 2,
                   child: Padding(
@@ -439,7 +506,9 @@ class _SettingsTabState extends State<_SettingsTab> {
                                 userEmail,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -452,13 +521,18 @@ class _SettingsTabState extends State<_SettingsTab> {
               ),
               const SizedBox(height: 24),
               Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 color: isDark ? const Color(0xFF0F172A) : Colors.white,
                 elevation: 2,
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.style_rounded, color: Colors.blue),
+                      leading: const Icon(
+                        Icons.style_rounded,
+                        color: Colors.blue,
+                      ),
                       title: const Text('Chủ đề tối (Dark Theme)'),
                       subtitle: const Text('Bật/Tắt chế độ giao diện tối'),
                       trailing: Switch(
@@ -470,9 +544,14 @@ class _SettingsTabState extends State<_SettingsTab> {
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.security_rounded, color: Colors.purple),
+                      leading: const Icon(
+                        Icons.security_rounded,
+                        color: Colors.purple,
+                      ),
                       title: const Text('Khóa ứng dụng bằng PIN'),
-                      subtitle: Text(_pinEnabled ? 'Đã kích hoạt' : 'Chưa kích hoạt'),
+                      subtitle: Text(
+                        _pinEnabled ? 'Đã kích hoạt' : 'Chưa kích hoạt',
+                      ),
                       trailing: Switch(
                         value: _pinEnabled,
                         onChanged: _togglePinLock,
@@ -480,9 +559,14 @@ class _SettingsTabState extends State<_SettingsTab> {
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.category_rounded, color: Colors.amber),
+                      leading: const Icon(
+                        Icons.category_rounded,
+                        color: Colors.amber,
+                      ),
                       title: const Text('Quản lý danh mục'),
-                      subtitle: const Text('Tùy chỉnh đề mục chi tiêu & thu nhập'),
+                      subtitle: const Text(
+                        'Tùy chỉnh đề mục chi tiêu & thu nhập',
+                      ),
                       trailing: const Icon(Icons.chevron_right_rounded),
                       onTap: () {
                         Navigator.pushNamed(context, AppRoutes.categories);
@@ -490,21 +574,35 @@ class _SettingsTabState extends State<_SettingsTab> {
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.ios_share_rounded, color: Colors.teal),
+                      leading: const Icon(
+                        Icons.ios_share_rounded,
+                        color: Colors.teal,
+                      ),
                       title: const Text('Xuất báo cáo dữ liệu'),
-                      subtitle: const Text('Xuất lịch sử giao dịch ra file CSV'),
+                      subtitle: const Text(
+                        'Xuất lịch sử giao dịch ra file CSV',
+                      ),
                       trailing: const Icon(Icons.file_download_outlined),
                       onTap: _exportToCsv,
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.info_outline_rounded, color: Colors.green),
+                      leading: const Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.green,
+                      ),
                       title: const Text('Phiên bản ứng dụng'),
-                      trailing: const Text('v1.1.0', style: TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: const Text(
+                        'v1.1.0',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+                      leading: const Icon(
+                        Icons.logout_rounded,
+                        color: Colors.redAccent,
+                      ),
                       title: const Text('Đăng xuất'),
                       onTap: () => _logout(context),
                     ),
