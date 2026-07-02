@@ -163,6 +163,48 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
     }
   }
 
+  void _showSearchDialog(TransactionProvider txProvider) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Tìm kiếm giao dịch'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Nhập ghi chú hoặc số tiền',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                txProvider.clearSearch();
+                Navigator.pop(context);
+              },
+              child: const Text('Hiện tất cả'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                txProvider.searchTransactions(controller.text);
+
+                Navigator.pop(context);
+              },
+              child: const Text('Tìm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -243,13 +285,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
               IconButton(
                 icon: const Icon(Icons.search_rounded, color: Colors.orange),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Tính năng tìm kiếm giao dịch đang phát triển.',
-                      ),
-                    ),
-                  );
+                  _showSearchDialog(txProvider);
                 },
               ),
             ],
