@@ -8,6 +8,31 @@ import '../../../../app/routes/app_router.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../application/providers/transaction_provider.dart';
+import 'package:intl/intl.dart';
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    } else if (newValue.text.compareTo(oldValue.text) != 0) {
+      final int selectionIndexFromTheRight =
+          newValue.text.length - newValue.selection.end;
+      final numberString = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+      if (numberString.isEmpty) return newValue.copyWith(text: '');
+      final number = int.parse(numberString);
+      final newString = NumberFormat.decimalPattern('vi_VN').format(number).replaceAll(',', '.');
+      return TextEditingValue(
+        text: newString,
+        selection: TextSelection.collapsed(
+            offset: newString.length - selectionIndexFromTheRight),
+      );
+    } else {
+      return newValue;
+    }
+  }
+}
 
 class TransactionInputView extends StatefulWidget {
   const TransactionInputView({super.key});
@@ -168,7 +193,8 @@ class _TransactionInputViewState extends State<TransactionInputView> {
       return;
     }
 
-    final double? amount = double.tryParse(_amountController.text);
+    final cleanAmountStr = _amountController.text.replaceAll('.', '').replaceAll(',', '');
+    final double? amount = double.tryParse(cleanAmountStr);
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng nhập số tiền lớn hơn 0.')),
@@ -417,14 +443,22 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                             ),
                             Expanded(
                               child: Container(
-                                height: 44,
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                height: 56,
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 decoration: BoxDecoration(
                                   color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFFEF3C7),
+                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFFDE68A),
+                                    width: 1.5,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (isDark ? Colors.black : const Color(0xFFFDE68A)).withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Row(
                                   children: [
@@ -434,15 +468,17 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                                         keyboardType: TextInputType.number,
                                         textAlign: TextAlign.right,
                                         inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly
+                                          FilteringTextInputFormatter.digitsOnly,
+                                          CurrencyInputFormatter(),
                                         ],
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
+                                          hintText: '0',
                                         ),
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 24,
                                           fontWeight: FontWeight.w900,
                                           color: isDark ? Colors.white : const Color(0xFF1E293B),
                                         ),

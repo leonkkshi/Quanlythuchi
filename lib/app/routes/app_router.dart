@@ -12,6 +12,8 @@ import '../../features/category/presentation/views/create_category_page.dart';
 import '../../features/home/presentation/views/main_navigation_shell.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/savings/presentation/views/savings_page.dart';
+import '../../features/savings/presentation/views/add_savings_goal_page.dart';
 
 /// Cấu hình GoRouter cho toàn bộ ứng dụng.
 class AppRouter {
@@ -24,6 +26,8 @@ class AppRouter {
   static const pinLock = '/pin-lock';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
+  static const savings = '/savings';
+  static const addSavings = '/savings/add';
 
   static GoRouter createRouter({required String initialLocation}) {
     return GoRouter(
@@ -70,6 +74,14 @@ class AppRouter {
         GoRoute(
           path: editProfile,
           builder: (context, state) => const EditProfilePage(),
+        ),
+        GoRoute(
+          path: savings,
+          builder: (context, state) => const SavingsPage(),
+        ),
+        GoRoute(
+          path: addSavings,
+          builder: (context, state) => const AddSavingsGoalPage(),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

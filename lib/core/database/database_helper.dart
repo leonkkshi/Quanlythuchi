@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -79,6 +79,18 @@ class DatabaseHelper {
         theme TEXT DEFAULT 'system',
         currency TEXT DEFAULT 'VND',
         notification INTEGER DEFAULT 1
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS savings_goals (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        target_amount REAL NOT NULL,
+        current_amount REAL NOT NULL DEFAULT 0,
+        deadline TEXT,
+        color_hex TEXT,
+        user_id TEXT NOT NULL
       )
     ''');
 
@@ -170,6 +182,19 @@ class DatabaseHelper {
         where: 'id = ?',
         whereArgs: ['u-001'],
       );
+    }
+    if (oldVersion < 5) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS savings_goals (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          target_amount REAL NOT NULL,
+          current_amount REAL NOT NULL DEFAULT 0,
+          deadline TEXT,
+          color_hex TEXT,
+          user_id TEXT NOT NULL
+        )
+      ''');
     }
   }
 
@@ -424,6 +449,40 @@ class DatabaseHelper {
   Future<int> deleteTransaction(String id) async {
     final db = await instance.database;
     return await db.delete('transactions', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // --- SAVINGS GOALS OPERATIONS ---
+  Future<List<Map<String, dynamic>>> getSavingsGoalsByUserId(String userId) async {
+    final db = await instance.database;
+    return await db.query(
+      'savings_goals',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  Future<int> insertSavingsGoal(Map<String, dynamic> goal) async {
+    final db = await instance.database;
+    return await db.insert(
+      'savings_goals',
+      goal,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+  
+  Future<int> updateSavingsGoal(String id, Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.update(
+      'savings_goals',
+      data,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deleteSavingsGoal(String id) async {
+    final db = await instance.database;
+    return await db.delete('savings_goals', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> updateUserProfile(

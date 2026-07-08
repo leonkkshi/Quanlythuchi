@@ -14,6 +14,7 @@ import '../features/transaction/application/providers/transaction_provider.dart'
 import '../features/profile/application/providers/profile_provider.dart';
 import '../features/reports/application/providers/report_provider.dart';
 import '../features/settings/application/providers/settings_provider.dart';
+import '../features/savings/application/providers/savings_provider.dart';
 import 'routes/app_router.dart';
 
 class MyApp extends StatefulWidget {
@@ -79,6 +80,9 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider<SettingsProvider>(
           create: (_) => SettingsProvider(),
+        ),
+        ChangeNotifierProvider<SavingsProvider>(
+          create: (_) => SavingsProvider(),
         ),
       ],
       child: Consumer<ThemeProvider>(

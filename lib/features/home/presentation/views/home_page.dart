@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../auth/application/services/auth_service_impl.dart';
 import '../../../auth/domain/entities/user.dart';
@@ -495,7 +496,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () => widget.onNavigateToTab?.call(1),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: _buildQuickActionButton(
             icon: IconlyBold.calendar,
@@ -505,7 +506,17 @@ class _HomePageState extends State<HomePage> {
             onTap: () => widget.onNavigateToTab?.call(2),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: IconlyBold.wallet,
+            label: 'Mục tiêu',
+            color: Colors.purple,
+            borderColor: borderColor,
+            onTap: () => context.push('/savings'),
+          ),
+        ),
+        const SizedBox(width: 8),
         Expanded(
           child: _buildQuickActionButton(
             icon: IconlyBold.chart,
