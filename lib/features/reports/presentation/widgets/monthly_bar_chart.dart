@@ -3,7 +3,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../models/monthly_summary.dart';
+import '../../domain/entities/monthly_summary.dart';
 
 /// Bar chart thu/chi theo tháng.
 class MonthlyBarChart extends StatelessWidget {

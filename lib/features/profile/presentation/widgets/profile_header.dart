@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../models/user_profile.dart';
+import '../../domain/entities/user_profile.dart';
 
 /// Header hiển thị avatar và thông tin cơ bản.
 class ProfileHeader extends StatelessWidget {

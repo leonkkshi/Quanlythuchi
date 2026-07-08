@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../models/category_summary.dart';
+import '../../domain/entities/category_summary.dart';
 import '../../../../widgets/currency_formatter.dart';
 
 /// Danh sách tổng hợp theo danh mục.

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../models/report_filter.dart';
+import '../../domain/entities/report_filter.dart';
 
 /// Bộ lọc thời gian + date range picker.
 class ReportFilterBar extends StatelessWidget {

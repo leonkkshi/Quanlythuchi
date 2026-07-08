@@ -3,7 +3,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../models/category_summary.dart';
+import '../../domain/entities/category_summary.dart';
 
 /// Pie chart chi tiêu theo danh mục.
 class ExpensePieChart extends StatelessWidget {

@@ -1,10 +1,10 @@
-// lib/services/report_repository.dart
+// lib/features/reports/data/repositories/report_repository.dart
 
-import '../database/database_helper.dart';
-import '../models/category_summary.dart';
-import '../models/monthly_summary.dart';
-import '../models/report_filter.dart';
-import '../models/report_transaction.dart';
+import '../../../../core/database/database_helper.dart';
+import '../../domain/entities/category_summary.dart';
+import '../../domain/entities/monthly_summary.dart';
+import '../../domain/entities/report_filter.dart';
+import '../../domain/entities/report_transaction.dart';
 
 /// Repository đọc dữ liệu báo cáo từ SQLite.
 class ReportRepository {

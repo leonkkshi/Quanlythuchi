@@ -1,4 +1,4 @@
-// lib/models/app_settings.dart
+// lib/features/settings/domain/entities/app_settings.dart
 
 /// Cài đặt ứng dụng (theme, currency, notification).
 class AppSettings {

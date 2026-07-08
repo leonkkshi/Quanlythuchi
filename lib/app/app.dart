@@ -11,9 +11,9 @@ import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/category/application/providers/budget_provider.dart';
 import '../features/category/application/providers/category_provider.dart';
 import '../features/transaction/application/providers/transaction_provider.dart';
-import '../providers/profile_provider.dart';
-import '../providers/report_provider.dart';
-import '../providers/settings_provider.dart';
+import '../features/profile/application/providers/profile_provider.dart';
+import '../features/reports/application/providers/report_provider.dart';
+import '../features/settings/application/providers/settings_provider.dart';
 import 'routes/app_router.dart';
 
 class MyApp extends StatefulWidget {

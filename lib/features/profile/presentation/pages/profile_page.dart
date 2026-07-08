@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/routes/app_router.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../providers/profile_provider.dart';
+import '../../application/providers/profile_provider.dart';
 import '../../../../widgets/async_state_view.dart';
 import '../widgets/profile_header.dart';
 

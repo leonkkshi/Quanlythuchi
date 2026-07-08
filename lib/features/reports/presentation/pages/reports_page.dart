@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../providers/report_provider.dart';
-import '../../../../providers/settings_provider.dart';
+import '../../application/providers/report_provider.dart';
+import '../../../settings/application/providers/settings_provider.dart';
 import '../../../../widgets/async_state_view.dart';
 import '../widgets/category_summary_list.dart';
 import '../widgets/expense_pie_chart.dart';

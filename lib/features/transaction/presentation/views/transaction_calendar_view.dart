@@ -684,7 +684,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
 
                                 final user = await authService.getCurrentUser();
 
-                                if (user != null) {
+                                if (user != null && context.mounted) {
                                   await Provider.of<TransactionProvider>(
                                     context,
                                     listen: false,

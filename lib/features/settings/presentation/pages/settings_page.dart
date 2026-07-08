@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/routes/app_router.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../providers/settings_provider.dart';
+import '../../application/providers/settings_provider.dart';
 
 /// Màn hình cài đặt ứng dụng.
 class SettingsPage extends StatefulWidget {

@@ -1,4 +1,4 @@
-// lib/models/user_profile.dart
+// lib/features/profile/domain/entities/user_profile.dart
 
 /// Hồ sơ người dùng lưu trong SQLite.
 class UserProfile {

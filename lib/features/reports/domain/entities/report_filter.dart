@@ -1,4 +1,4 @@
-// lib/models/report_filter.dart
+// lib/features/reports/domain/entities/report_filter.dart
 
 /// Bộ lọc thời gian cho báo cáo.
 enum ReportPeriod {

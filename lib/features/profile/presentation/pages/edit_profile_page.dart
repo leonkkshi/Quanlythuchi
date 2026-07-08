@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../providers/profile_provider.dart';
+import '../../application/providers/profile_provider.dart';
 
 /// Màn hình chỉnh sửa hồ sơ với validate.
 class EditProfilePage extends StatefulWidget {

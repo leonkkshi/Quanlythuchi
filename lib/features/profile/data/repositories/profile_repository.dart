@@ -1,11 +1,10 @@
-// lib/services/profile_repository.dart
+// lib/features/profile/data/repositories/profile_repository.dart
 
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../database/database_helper.dart';
-import '../models/user_profile.dart';
+import '../../../../core/database/database_helper.dart';
+import '../../domain/entities/user_profile.dart';
 
 /// Repository quản lý hồ sơ người dùng trong SQLite.
 class ProfileRepository {

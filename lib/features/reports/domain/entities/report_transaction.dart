@@ -1,4 +1,4 @@
-// lib/models/report_transaction.dart
+// lib/features/reports/domain/entities/report_transaction.dart
 
 /// Giao dịch dùng cho module báo cáo (đã resolve tên danh mục).
 class ReportTransaction {

@@ -1,4 +1,4 @@
-// lib/models/category_summary.dart
+// lib/features/reports/domain/entities/category_summary.dart
 
 /// Tổng hợp chi tiêu theo danh mục.
 class CategorySummary {

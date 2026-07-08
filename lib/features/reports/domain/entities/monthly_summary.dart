@@ -1,4 +1,4 @@
-// lib/models/monthly_summary.dart
+// lib/features/reports/domain/entities/monthly_summary.dart
 
 /// Tổng hợp thu/chi theo tháng.
 class MonthlySummary {

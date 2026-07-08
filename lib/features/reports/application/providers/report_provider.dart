@@ -1,12 +1,12 @@
-// lib/providers/report_provider.dart
+// lib/features/reports/application/providers/report_provider.dart
 
 import 'package:flutter/material.dart';
 
-import '../models/category_summary.dart';
-import '../models/monthly_summary.dart';
-import '../models/report_filter.dart';
-import '../models/report_transaction.dart';
-import '../services/report_repository.dart';
+import '../../domain/entities/category_summary.dart';
+import '../../domain/entities/monthly_summary.dart';
+import '../../domain/entities/report_filter.dart';
+import '../../domain/entities/report_transaction.dart';
+import '../../data/repositories/report_repository.dart';
 
 /// Provider quản lý state và logic báo cáo.
 class ReportProvider extends ChangeNotifier {

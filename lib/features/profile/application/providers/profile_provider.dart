@@ -1,9 +1,9 @@
-// lib/providers/profile_provider.dart
+// lib/features/profile/application/providers/profile_provider.dart
 
 import 'package:flutter/material.dart';
 
-import '../models/user_profile.dart';
-import '../services/profile_repository.dart';
+import '../../domain/entities/user_profile.dart';
+import '../../data/repositories/profile_repository.dart';
 
 /// Provider quản lý hồ sơ người dùng.
 class ProfileProvider extends ChangeNotifier {

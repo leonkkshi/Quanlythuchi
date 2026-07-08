@@ -1,9 +1,9 @@
-// lib/services/settings_repository.dart
+// lib/features/settings/data/repositories/settings_repository.dart
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../database/database_helper.dart';
-import '../models/app_settings.dart';
+import '../../../../core/database/database_helper.dart';
+import '../../domain/entities/app_settings.dart';
 
 /// Repository lưu cài đặt vào SharedPreferences và SQLite.
 class SettingsRepository {

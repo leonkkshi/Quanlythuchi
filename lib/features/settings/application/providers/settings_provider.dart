@@ -1,9 +1,9 @@
-// lib/providers/settings_provider.dart
+// lib/features/settings/application/providers/settings_provider.dart
 
 import 'package:flutter/material.dart';
 
-import '../models/app_settings.dart';
-import '../services/settings_repository.dart';
+import '../../domain/entities/app_settings.dart';
+import '../../data/repositories/settings_repository.dart';
 
 /// Provider quản lý cài đặt ứng dụng.
 class SettingsProvider extends ChangeNotifier {
