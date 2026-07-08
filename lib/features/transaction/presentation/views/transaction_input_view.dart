@@ -596,14 +596,14 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                               borderRadius: BorderRadius.circular(28),
                             ),
                             elevation: 0,
-                          ),
-                          child: Text(
-                            _activeTab == 'expense' ? 'Nhập khoản chi' : 'Nhập khoản thu',
-                            style: const TextStyle(
+                            textStyle: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                             ),
+                          ),
+                          child: Text(
+                            _activeTab == 'expense' ? 'Nhập khoản chi' : 'Nhập khoản thu',
                           ),
                         ),
                       ],

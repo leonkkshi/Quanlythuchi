@@ -20,8 +20,11 @@ class ProfileHeader extends StatelessWidget {
         ? DateFormat('dd/MM/yyyy').format(profile.createdAt!)
         : 'Chưa cập nhật';
 
-    final avatarUrl = profile.avatar ??
+    final rawAvatar = profile.avatar ??
         'https://api.dicebear.com/7.x/adventurer/png?seed=${profile.name}';
+    
+    // Fix existing database entries that used SVG
+    final avatarUrl = rawAvatar.replaceAll('/svg?', '/png?');
 
     return Card(
       elevation: 2,

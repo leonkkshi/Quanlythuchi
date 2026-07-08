@@ -10,6 +10,7 @@ import '../../../category/data/models/category_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../transaction/application/providers/transaction_provider.dart';
 import '../../../transaction/data/models/transaction_model.dart';
+import '../../../settings/presentation/pages/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   final ValueChanged<int>? onNavigateToTab;
@@ -289,7 +290,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildHeader(BuildContext context, Color primaryColor) {
     final theme = Theme.of(context);
-    final avatarUrl = _currentUser?.avatarUrl;
+    final rawAvatarUrl = _currentUser?.avatarUrl;
+    final avatarUrl = rawAvatarUrl?.replaceAll('/svg?', '/png?');
     final userName = _currentUser?.name ?? 'Người dùng';
     final initial = userName.isNotEmpty ? userName[0].toUpperCase() : 'U';
 
@@ -326,7 +328,7 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Xin chào, $userName',
+                userName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleLarge?.copyWith(
@@ -337,9 +339,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         IconButton(
-          onPressed: _loadDashboardData,
-          tooltip: 'Làm mới',
-          icon: Icon(IconlyLight.swap, color: primaryColor),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
+            );
+          },
+          tooltip: 'Cài đặt',
+          icon: Icon(Icons.person_outline, color: primaryColor),
         ),
       ],
     );
