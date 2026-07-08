@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../auth/application/services/auth_service_impl.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../../category/application/providers/budget_provider.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/data/models/category_model.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../transaction/application/providers/transaction_provider.dart';
 import '../../../transaction/data/models/transaction_model.dart';
+import '../../../settings/presentation/pages/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   final ValueChanged<int>? onNavigateToTab;
@@ -100,7 +104,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -153,7 +157,7 @@ class _HomePageState extends State<HomePage> {
     return _TopCategory(
       name: category?.name ?? 'Chưa phân loại',
       amount: top.value,
-      iconCode: category?.iconCode ?? Icons.category_outlined.codePoint,
+      iconCode: category?.iconCode ?? IconlyLight.category.codePoint,
       colorHex: category?.colorHex ?? '#F97316',
     );
   }
@@ -161,9 +165,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = Colors.orange[800] ?? Colors.orange;
-    final surfaceColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final primaryColor = AppColors.primary;
+    final surfaceColor = theme.colorScheme.surface;
+    final borderColor = theme.dividerColor;
 
     final txProvider = context.watch<TransactionProvider>();
     final categoryProvider = context.watch<CategoryProvider>();
@@ -203,16 +207,16 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF020617)
-          : const Color(0xFFF8FAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: _loadDashboardData,
+        color: primaryColor,
+        backgroundColor: theme.colorScheme.background,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
           children: [
-            _buildHeader(context, primaryColor, isDark),
+            _buildHeader(context, primaryColor),
             const SizedBox(height: 18),
             _buildBalanceCard(
               primaryColor: primaryColor,
@@ -222,22 +226,18 @@ class _HomePageState extends State<HomePage> {
               transactionCount: monthlyTransactions.length,
             ),
             const SizedBox(height: 18),
-            _buildQuickActions(primaryColor),
+            _buildQuickActions(primaryColor, borderColor),
             const SizedBox(height: 18),
             Row(
               children: [
                 Expanded(
                   child: _buildInsightCard(
                     surfaceColor: surfaceColor,
-                    isDark: isDark,
-                    icon: Icons.savings_outlined,
-                    color: remainingBudget >= 0
-                        ? Colors.green
-                        : Colors.redAccent,
+                    borderColor: borderColor,
+                    icon: IconlyLight.wallet,
+                    color: totalBudget >= 0 ? AppColors.tradingUp : AppColors.tradingDown,
                     title: 'Ngân sách tháng',
-                    value: totalBudget > 0
-                        ? _formatCurrency(totalBudget)
-                        : 'Chưa đặt',
+                    value: totalBudget > 0 ? _formatCurrency(totalBudget) : 'Chưa đặt',
                     subtitle: totalBudget > 0
                         ? 'Còn lại ${_formatCurrency(remainingBudget)}'
                         : 'Thiết lập ở tab Ngân sách',
@@ -248,8 +248,8 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: _buildInsightCard(
                     surfaceColor: surfaceColor,
-                    isDark: isDark,
-                    icon: Icons.local_fire_department_outlined,
+                    borderColor: borderColor,
+                    icon: IconlyLight.discovery,
                     color: topCategory == null
                         ? primaryColor
                         : _getColorFromHex(topCategory.colorHex),
@@ -273,14 +273,14 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             else if (visibleRecentTransactions.isEmpty)
-              _buildEmptyState(surfaceColor, isDark)
+              _buildEmptyState(surfaceColor, borderColor)
             else
               ...visibleRecentTransactions.map(
                 (transaction) => _buildTransactionItem(
                   transaction,
                   categoryProvider.categories,
                   surfaceColor,
-                  isDark,
+                  borderColor,
                 ),
               ),
           ],
@@ -289,8 +289,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, Color primaryColor, bool isDark) {
-    final avatarUrl = _currentUser?.avatarUrl;
+  Widget _buildHeader(BuildContext context, Color primaryColor) {
+    final theme = Theme.of(context);
+    final rawAvatarUrl = _currentUser?.avatarUrl;
+    final avatarUrl = rawAvatarUrl?.replaceAll('/svg?', '/png?');
     final userName = _currentUser?.name ?? 'Người dùng';
     final initial = userName.isNotEmpty ? userName[0].toUpperCase() : 'U';
 
@@ -305,7 +307,7 @@ class _HomePageState extends State<HomePage> {
           child: avatarUrl == null || avatarUrl.isEmpty
               ? Text(
                   initial,
-                  style: TextStyle(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: primaryColor,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -318,24 +320,12 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               Text(
-                'Tổng quan tháng $_selectedMonth/$_selectedYear',
-                style: TextStyle(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Xin chào, $userName',
+                userName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  fontSize: 22,
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -343,9 +333,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         IconButton(
-          onPressed: _loadDashboardData,
-          tooltip: 'Làm mới',
-          icon: Icon(Icons.refresh_rounded, color: primaryColor),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
+            );
+          },
+          tooltip: 'Cài đặt',
+          icon: Icon(Icons.person_outline, color: primaryColor),
         ),
       ],
     );
@@ -363,13 +357,13 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
         gradient: LinearGradient(
-          colors: [primaryColor, const Color(0xFFFB923C)],
+          colors: [primaryColor, AppColors.primaryActive],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.28),
+            color: primaryColor.withOpacity(0.24),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),
@@ -425,19 +419,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: Icons.arrow_downward_rounded,
+                  icon: IconlyBold.download,
                   label: 'Tổng thu',
                   value: _formatCurrency(totalIncome),
-                  color: const Color(0xFFBBF7D0),
+                  color: AppColors.tradingUp,
                 ),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: Icons.arrow_upward_rounded,
+                  icon: IconlyBold.upload,
                   label: 'Tổng chi',
                   value: _formatCurrency(totalExpense),
-                  color: const Color(0xFFFECACA),
+                  color: AppColors.tradingDown,
                 ),
               ),
             ],
@@ -458,7 +452,7 @@ class _HomePageState extends State<HomePage> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.14),
+            color: Colors.white.withOpacity(0.16),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 18),
@@ -490,32 +484,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildQuickActions(Color primaryColor) {
+  Widget _buildQuickActions(Color primaryColor, Color borderColor) {
     return Row(
       children: [
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.add_rounded,
+            icon: IconlyBold.plus,
             label: 'Nhập thu/chi',
             color: primaryColor,
+            borderColor: borderColor,
             onTap: () => widget.onNavigateToTab?.call(1),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.calendar_month_rounded,
+            icon: IconlyBold.calendar,
             label: 'Lịch',
-            color: Colors.blue,
+            color: AppColors.info,
+            borderColor: borderColor,
             onTap: () => widget.onNavigateToTab?.call(2),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.pie_chart_rounded,
-            label: 'Báo cáo',
+            icon: IconlyBold.wallet,
+            label: 'Mục tiêu',
             color: Colors.purple,
+            borderColor: borderColor,
+            onTap: () => context.push('/savings'),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: _buildQuickActionButton(
+            icon: IconlyBold.chart,
+            label: 'Báo cáo',
+            color: AppColors.tradingDown,
+            borderColor: borderColor,
             onTap: () => widget.onNavigateToTab?.call(3),
           ),
         ),
@@ -527,9 +534,10 @@ class _HomePageState extends State<HomePage> {
     required IconData icon,
     required String label,
     required Color color,
+    required Color borderColor,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return InkWell(
       onTap: onTap,
@@ -537,11 +545,9 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-          ),
+          border: Border.all(color: borderColor),
         ),
         child: Column(
           children: [
@@ -558,7 +564,10 @@ class _HomePageState extends State<HomePage> {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -568,7 +577,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildInsightCard({
     required Color surfaceColor,
-    required bool isDark,
+    required Color borderColor,
     required IconData icon,
     required Color color,
     required String title,
@@ -576,15 +585,15 @@ class _HomePageState extends State<HomePage> {
     required String subtitle,
     double? progress,
   }) {
+    final theme = Theme.of(context);
+
     return Container(
       constraints: const BoxConstraints(minHeight: 156),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -600,9 +609,8 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-              fontSize: 12,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppColors.mutedStrong,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -611,9 +619,7 @@ class _HomePageState extends State<HomePage> {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
-              fontSize: 17,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -622,9 +628,8 @@ class _HomePageState extends State<HomePage> {
             subtitle,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-              fontSize: 12,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.mutedStrong,
             ),
           ),
           if (progress != null) ...[
@@ -634,9 +639,7 @@ class _HomePageState extends State<HomePage> {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 7,
-                backgroundColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9),
+                backgroundColor: theme.dividerColor,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ),
@@ -647,48 +650,51 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildRecentHeader(Color primaryColor) {
+    final theme = Theme.of(context);
+
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Text(
             'Giao dịch gần đây',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
           ),
         ),
         TextButton(
           onPressed: () => widget.onNavigateToTab?.call(2),
           child: Text(
             'Xem lịch',
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.w800),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: primaryColor,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState(Color surfaceColor, bool isDark) {
+  Widget _buildEmptyState(Color surfaceColor, Color borderColor) {
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.receipt_long_outlined,
+          Icon(
+            IconlyLight.document,
             size: 42,
-            color: Colors.orange,
+            color: AppColors.primary,
           ),
           const SizedBox(height: 12),
           Text(
             'Chưa có giao dịch',
-            style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
-              fontSize: 16,
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -696,15 +702,23 @@ class _HomePageState extends State<HomePage> {
           Text(
             'Hãy nhập khoản thu hoặc chi đầu tiên để Dashboard tự cập nhật.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.mutedStrong,
             ),
           ),
           const SizedBox(height: 14),
           ElevatedButton.icon(
             onPressed: () => widget.onNavigateToTab?.call(1),
-            icon: const Icon(Icons.add_rounded),
+            icon: const Icon(IconlyBold.plus),
             label: const Text('Nhập giao dịch'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.onPrimary,
+              minimumSize: const Size.fromHeight(48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ],
       ),
@@ -715,12 +729,14 @@ class _HomePageState extends State<HomePage> {
     TransactionModel transaction,
     List<CategoryModel> categories,
     Color surfaceColor,
-    bool isDark,
+    Color borderColor,
   ) {
+    final theme = Theme.of(context);
+
     final category = _findCategory(categories, transaction.categoryId);
     final isIncome = transaction.type == 'income';
     final color = category == null
-        ? (isIncome ? Colors.green : Colors.redAccent)
+        ? (isIncome ? AppColors.tradingUp : AppColors.tradingDown)
         : _getColorFromHex(category.colorHex);
 
     return Container(
@@ -729,9 +745,7 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
@@ -742,9 +756,7 @@ class _HomePageState extends State<HomePage> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              category == null
-                  ? Icons.category_outlined
-                  : _getIconData(category.iconCode),
+              category == null ? IconlyLight.category : _getIconData(category.iconCode),
               color: color,
               size: 20,
             ),
@@ -758,8 +770,8 @@ class _HomePageState extends State<HomePage> {
                   category?.name ?? 'Chưa phân loại',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -767,16 +779,13 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   [
                     _formatDateLabel(transaction.date),
-                    if (transaction.note != null &&
-                        transaction.note!.isNotEmpty)
+                    if (transaction.note != null && transaction.note!.isNotEmpty)
                       transaction.note!,
                   ].join(' • '),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isDark
-                        ? const Color(0xFF64748B)
-                        : const Color(0xFF94A3B8),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.mutedStrong,
                     fontSize: 12,
                   ),
                 ),
@@ -787,7 +796,7 @@ class _HomePageState extends State<HomePage> {
           Text(
             '${isIncome ? '+' : '-'}${_formatCurrency(transaction.amount)}',
             style: TextStyle(
-              color: isIncome ? Colors.green : Colors.redAccent,
+              color: isIncome ? AppColors.tradingUp : AppColors.tradingDown,
               fontWeight: FontWeight.w900,
               fontSize: 14,
             ),

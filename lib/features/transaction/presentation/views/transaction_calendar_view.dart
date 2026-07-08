@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../application/providers/transaction_provider.dart';
+import 'transaction_edit_view.dart';
 
 class TransactionCalendarView extends StatefulWidget {
   const TransactionCalendarView({super.key});
 
   @override
-  State<TransactionCalendarView> createState() => _TransactionCalendarViewState();
+  State<TransactionCalendarView> createState() =>
+      _TransactionCalendarViewState();
 }
 
 class _TransactionCalendarViewState extends State<TransactionCalendarView> {
@@ -28,8 +31,14 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
       final authService = Provider.of<AuthServiceImpl>(context, listen: false);
       final user = await authService.getCurrentUser();
       if (user != null && mounted) {
-        Provider.of<TransactionProvider>(context, listen: false).loadTransactions(user.id);
-        Provider.of<CategoryProvider>(context, listen: false).loadCategories(user.id);
+        Provider.of<TransactionProvider>(
+          context,
+          listen: false,
+        ).loadTransactions(user.id);
+        Provider.of<CategoryProvider>(
+          context,
+          listen: false,
+        ).loadCategories(user.id);
       }
     });
   }
@@ -40,14 +49,22 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
 
   String _getWeekdayName(int weekday) {
     switch (weekday) {
-      case 1: return 'Th 2';
-      case 2: return 'Th 3';
-      case 3: return 'Th 4';
-      case 4: return 'Th 5';
-      case 5: return 'Th 6';
-      case 6: return 'Th 7';
-      case 7: return 'CN';
-      default: return '';
+      case 1:
+        return 'Th 2';
+      case 2:
+        return 'Th 3';
+      case 3:
+        return 'Th 4';
+      case 4:
+        return 'Th 5';
+      case 5:
+        return 'Th 6';
+      case 6:
+        return 'Th 7';
+      case 7:
+        return 'CN';
+      default:
+        return '';
     }
   }
 
@@ -84,7 +101,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -135,13 +152,58 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
     );
 
     if (confirmed == true && context.mounted) {
-      final success = await Provider.of<TransactionProvider>(context, listen: false).deleteTransaction(id);
+      final success = await Provider.of<TransactionProvider>(
+        context,
+        listen: false,
+      ).deleteTransaction(id);
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã xóa giao dịch thành công!')),
         );
       }
     }
+  }
+
+  void _showSearchDialog(TransactionProvider txProvider) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Tìm kiếm giao dịch'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Nhập ghi chú hoặc số tiền',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                txProvider.clearSearch();
+                Navigator.pop(context);
+              },
+              child: const Text('Hiện tất cả'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                txProvider.searchTransactions(controller.text);
+
+                Navigator.pop(context);
+              },
+              child: const Text('Tìm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -163,7 +225,13 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
         // Previous month padding days
         final prevMonthEnd = DateTime(_selectedYear, _selectedMonth, 0);
         for (int i = prevMonthDaysCount - 1; i >= 0; i--) {
-          cells.add(DateTime(prevMonthEnd.year, prevMonthEnd.month, prevMonthEnd.day - i));
+          cells.add(
+            DateTime(
+              prevMonthEnd.year,
+              prevMonthEnd.month,
+              prevMonthEnd.day - i,
+            ),
+          );
         }
 
         // Current month days
@@ -176,12 +244,17 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
         final totalCells = cells.length <= 35 ? 35 : 42;
         int nextMonthDay = 1;
         while (cells.length < totalCells) {
-          cells.add(DateTime(_selectedYear, _selectedMonth + 1, nextMonthDay++));
+          cells.add(
+            DateTime(_selectedYear, _selectedMonth + 1, nextMonthDay++),
+          );
         }
 
         // Filter transactions for currently selected day
-        final selectedDateStr = "${_selectedYear.toString().padLeft(4, '0')}-${_selectedMonth.toString().padLeft(2, '0')}-${_selectedDay.toString().padLeft(2, '0')}";
-        final selectedDayTxs = transactions.where((tx) => tx.date == selectedDateStr).toList();
+        final selectedDateStr =
+            "${_selectedYear.toString().padLeft(4, '0')}-${_selectedMonth.toString().padLeft(2, '0')}-${_selectedDay.toString().padLeft(2, '0')}";
+        final selectedDayTxs = transactions
+            .where((tx) => tx.date == selectedDateStr)
+            .toList();
 
         // Calculate sums for the selected day
         double dayIncome = 0;
@@ -211,11 +284,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(Icons.search_rounded, color: Colors.orange),
+                icon: const Icon(IconlyLight.search, color: Colors.orange),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Tính năng tìm kiếm giao dịch đang phát triển.')),
-                  );
+                  _showSearchDialog(txProvider);
                 },
               ),
             ],
@@ -224,21 +295,31 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
             children: [
               // 1. Month Selector
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
+                    color: isDark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFFFFBEB),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF334155) : const Color(0xFFFEF3C7),
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFFEF3C7),
                     ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(
+                          IconlyLight.arrow_left_2,
+                          color: Color(0xFF94A3B8),
+                        ),
                         onPressed: () => _changeMonth(-1),
                       ),
                       Text(
@@ -246,11 +327,16 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: isDark ? Colors.white : const Color(0xFF78350F),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF78350F),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(
+                          IconlyLight.arrow_right_2,
+                          color: Color(0xFF94A3B8),
+                        ),
                         onPressed: () => _changeMonth(1),
                       ),
                     ],
@@ -260,12 +346,16 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
 
               // 2. Weekdays Header
               Container(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                color: isDark
+                    ? const Color(0xFF0F172A)
+                    : const Color(0xFFF8FAFC),
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
                   children: List.generate(7, (index) {
                     final dayLabel = _getWeekdayName(index + 1);
-                    Color textColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+                    Color textColor = isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B);
                     if (index == 5) {
                       textColor = Colors.blue[400] ?? Colors.blue;
                     } else if (index == 6) {
@@ -298,12 +388,17 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                 itemCount: totalCells,
                 itemBuilder: (context, index) {
                   final cell = cells[index];
-                  final isCurrentMonth = cell.month == _selectedMonth && cell.year == _selectedYear;
+                  final isCurrentMonth =
+                      cell.month == _selectedMonth &&
+                      cell.year == _selectedYear;
                   final isSelected = cell.day == _selectedDay && isCurrentMonth;
 
                   // Format cell date string to lookup transactions
-                  final cellDateStr = "${cell.year.toString().padLeft(4, '0')}-${cell.month.toString().padLeft(2, '0')}-${cell.day.toString().padLeft(2, '0')}";
-                  final cellTxs = transactions.where((tx) => tx.date == cellDateStr).toList();
+                  final cellDateStr =
+                      "${cell.year.toString().padLeft(4, '0')}-${cell.month.toString().padLeft(2, '0')}-${cell.day.toString().padLeft(2, '0')}";
+                  final cellTxs = transactions
+                      .where((tx) => tx.date == cellDateStr)
+                      .toList();
 
                   // Sum expense & income for this day cell
                   double cellExpense = 0;
@@ -317,9 +412,13 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                   }
 
                   // Determine display color for day number
-                  Color dayColor = isDark ? Colors.white : const Color(0xFF1E293B);
+                  Color dayColor = isDark
+                      ? Colors.white
+                      : const Color(0xFF1E293B);
                   if (!isCurrentMonth) {
-                    dayColor = isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1);
+                    dayColor = isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFFCBD5E1);
                   } else {
                     final weekday = cell.weekday;
                     if (weekday == 6) {
@@ -346,11 +445,15 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isSelected 
-                            ? (isDark ? const Color(0xFF78350F).withOpacity(0.3) : const Color(0xFFFFFBEB)) 
+                        color: isSelected
+                            ? (isDark
+                                  ? const Color(0xFF78350F).withOpacity(0.3)
+                                  : const Color(0xFFFFFBEB))
                             : Colors.transparent,
                         border: Border.all(
-                          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFFF1F5F9),
                           width: 0.5,
                         ),
                       ),
@@ -362,7 +465,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                           Text(
                             '${cell.day}',
                             style: TextStyle(
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               fontSize: 13,
                               color: dayColor,
                             ),
@@ -403,7 +508,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                 decoration: BoxDecoration(
                   border: Border.symmetric(
                     horizontal: BorderSide(
-                      color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFE2E8F0),
                       width: 1,
                     ),
                   ),
@@ -470,7 +577,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: dayTotal >= 0 ? Colors.blueAccent : Colors.redAccent,
+                            color: dayTotal >= 0
+                                ? Colors.blueAccent
+                                : Colors.redAccent,
                           ),
                         ),
                       ],
@@ -481,8 +590,13 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
 
               // 5. Selected Day Transactions List Header
               Container(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                color: isDark
+                    ? const Color(0xFF0F172A)
+                    : const Color(0xFFF8FAFC),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -491,7 +605,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
                       ),
                     ),
                     Text(
@@ -499,7 +615,9 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: dayTotal >= 0 ? Colors.blueAccent : Colors.redAccent,
+                        color: dayTotal >= 0
+                            ? Colors.blueAccent
+                            : Colors.redAccent,
                       ),
                     ),
                   ],
@@ -513,29 +631,68 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                         child: Text(
                           'Không có giao dịch nào trong ngày này.',
                           style: TextStyle(
-                            color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8),
+                            color: isDark
+                                ? const Color(0xFF475569)
+                                : const Color(0xFF94A3B8),
                             fontSize: 14,
                           ),
                         ),
                       )
                     : ListView.separated(
                         itemCount: selectedDayTxs.length,
-                        separatorBuilder: (context, index) => const Divider(height: 1),
+                        separatorBuilder: (context, index) => const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final tx = selectedDayTxs[index];
-                          
+
                           // Lookup category info
-                          final hasCategory = categories.any((c) => c.id == tx.categoryId);
+                          final hasCategory = categories.any(
+                            (c) => c.id == tx.categoryId,
+                          );
                           final category = hasCategory
-                              ? categories.firstWhere((c) => c.id == tx.categoryId)
+                              ? categories.firstWhere(
+                                  (c) => c.id == tx.categoryId,
+                                )
                               : null;
 
-                          final catName = category != null ? category.name : 'Chưa phân loại';
-                          final catIconCode = category != null ? category.iconCode : 0xe532;
-                          final catColorHex = category != null ? category.colorHex : '#94A3B8';
+                          final catName = category != null
+                              ? category.name
+                              : 'Chưa phân loại';
+                          final catIconCode = category != null
+                              ? category.iconCode
+                              : IconlyLight.category.codePoint;
+                          final catColorHex = category != null
+                              ? category.colorHex
+                              : '#94A3B8';
                           final catColor = _getColorFromHex(catColorHex);
 
                           return ListTile(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      EditTransactionView(transaction: tx),
+                                ),
+                              );
+
+                              if (result == true && context.mounted) {
+                                final authService =
+                                    Provider.of<AuthServiceImpl>(
+                                      context,
+                                      listen: false,
+                                    );
+
+                                final user = await authService.getCurrentUser();
+
+                                if (user != null && context.mounted) {
+                                  await Provider.of<TransactionProvider>(
+                                    context,
+                                    listen: false,
+                                  ).loadTransactions(user.id);
+                                }
+                              }
+                            },
+
                             onLongPress: () => _deleteTx(context, tx.id),
                             leading: Container(
                               padding: const EdgeInsets.all(8),
@@ -553,14 +710,18 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                               catName,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF1E293B),
                               ),
                             ),
                             subtitle: tx.note != null && tx.note!.isNotEmpty
                                 ? Text(
                                     tx.note!,
                                     style: TextStyle(
-                                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                      color: isDark
+                                          ? const Color(0xFF64748B)
+                                          : const Color(0xFF94A3B8),
                                       fontSize: 12,
                                     ),
                                   )
@@ -573,12 +734,14 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
-                                    color: tx.type == 'income' ? Colors.blueAccent : const Color(0xFF334155),
+                                    color: tx.type == 'income'
+                                        ? Colors.blueAccent
+                                        : const Color(0xFF334155),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 const Icon(
-                                  Icons.chevron_right_rounded,
+                                  IconlyLight.arrow_right_2,
                                   color: Color(0xFFCBD5E1),
                                   size: 20,
                                 ),
