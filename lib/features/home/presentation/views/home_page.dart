@@ -319,14 +319,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Tổng quan tháng $_selectedMonth/$_selectedYear',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.mutedStrong,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
+
               Text(
                 userName,
                 maxLines: 1,
