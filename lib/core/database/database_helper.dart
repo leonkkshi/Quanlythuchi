@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -32,7 +32,9 @@ class DatabaseHelper {
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
-        avatarUrl TEXT
+        avatarUrl TEXT,
+        phone TEXT,
+        createdAt TEXT
       )
     ''');
 
@@ -50,6 +52,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE transactions (
         id TEXT PRIMARY KEY,
+        title TEXT,
         amount REAL NOT NULL,
         date TEXT NOT NULL,
         note TEXT,
@@ -70,6 +73,34 @@ class DatabaseHelper {
       )
     ''');
 
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY DEFAULT 1,
+        theme TEXT DEFAULT 'system',
+        currency TEXT DEFAULT 'VND',
+        notification INTEGER DEFAULT 1
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS savings_goals (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        target_amount REAL NOT NULL,
+        current_amount REAL NOT NULL DEFAULT 0,
+        deadline TEXT,
+        color_hex TEXT,
+        user_id TEXT NOT NULL
+      )
+    ''');
+
+    await db.insert('settings', {
+      'id': 1,
+      'theme': 'system',
+      'currency': 'VND',
+      'notification': 1,
+    });
+
     // Seed default demo user
     await db.insert('users', {
       'id': 'u-001',
@@ -77,6 +108,8 @@ class DatabaseHelper {
       'email': 'admin@example.com',
       'password': 'password123',
       'avatarUrl': 'https://api.dicebear.com/7.x/adventurer/png?seed=Minh',
+      'phone': '0901234567',
+      'createdAt': DateTime.now().toIso8601String(),
     });
 
     // Seed default categories for demo user u-001
@@ -118,6 +151,47 @@ class DatabaseHelper {
           category_id TEXT NOT NULL,
           amount REAL NOT NULL,
           period TEXT NOT NULL,
+          user_id TEXT NOT NULL
+        )
+      ''');
+    }
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE users ADD COLUMN phone TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN createdAt TEXT');
+      await db.execute('ALTER TABLE transactions ADD COLUMN title TEXT');
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
+          id INTEGER PRIMARY KEY DEFAULT 1,
+          theme TEXT DEFAULT 'system',
+          currency TEXT DEFAULT 'VND',
+          notification INTEGER DEFAULT 1
+        )
+      ''');
+      await db.insert('settings', {
+        'id': 1,
+        'theme': 'system',
+        'currency': 'VND',
+        'notification': 1,
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      await db.update(
+        'users',
+        {
+          'phone': '0901234567',
+          'createdAt': DateTime.now().toIso8601String(),
+        },
+        where: 'id = ?',
+        whereArgs: ['u-001'],
+      );
+    }
+    if (oldVersion < 5) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS savings_goals (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          target_amount REAL NOT NULL,
+          current_amount REAL NOT NULL DEFAULT 0,
+          deadline TEXT,
+          color_hex TEXT,
           user_id TEXT NOT NULL
         )
       ''');
@@ -252,7 +326,11 @@ class DatabaseHelper {
 
     final batch = db.batch();
     for (var cat in defaultCategories) {
-      batch.insert('categories', cat, conflictAlgorithm: ConflictAlgorithm.ignore);
+      batch.insert(
+        'categories',
+        cat,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
     }
     await batch.commit(noResult: true);
   }
@@ -275,7 +353,6 @@ class DatabaseHelper {
     final db = await instance.database;
     final maps = await db.query(
       'users',
-      columns: ['id', 'name', 'email', 'password', 'avatarUrl'],
       where: 'email = ?',
       whereArgs: [email.toLowerCase().trim()],
     );
@@ -290,7 +367,6 @@ class DatabaseHelper {
     final db = await instance.database;
     final maps = await db.query(
       'users',
-      columns: ['id', 'name', 'email', 'password', 'avatarUrl'],
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -323,7 +399,9 @@ class DatabaseHelper {
   }
 
   // --- CATEGORIES OPERATIONS ---
-  Future<List<Map<String, dynamic>>> getCategoriesByUserId(String userId) async {
+  Future<List<Map<String, dynamic>>> getCategoriesByUserId(
+    String userId,
+  ) async {
     final db = await instance.database;
     return await db.query(
       'categories',
@@ -343,15 +421,13 @@ class DatabaseHelper {
 
   Future<int> deleteCategory(String id) async {
     final db = await instance.database;
-    return await db.delete(
-      'categories',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('categories', where: 'id = ?', whereArgs: [id]);
   }
 
   // --- TRANSACTIONS OPERATIONS ---
-  Future<List<Map<String, dynamic>>> getTransactionsByUserId(String userId) async {
+  Future<List<Map<String, dynamic>>> getTransactionsByUserId(
+    String userId,
+  ) async {
     final db = await instance.database;
     return await db.query(
       'transactions',
@@ -372,14 +448,48 @@ class DatabaseHelper {
 
   Future<int> deleteTransaction(String id) async {
     final db = await instance.database;
-    return await db.delete(
-      'transactions',
+    return await db.delete('transactions', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // --- SAVINGS GOALS OPERATIONS ---
+  Future<List<Map<String, dynamic>>> getSavingsGoalsByUserId(String userId) async {
+    final db = await instance.database;
+    return await db.query(
+      'savings_goals',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  Future<int> insertSavingsGoal(Map<String, dynamic> goal) async {
+    final db = await instance.database;
+    return await db.insert(
+      'savings_goals',
+      goal,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+  
+  Future<int> updateSavingsGoal(String id, Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.update(
+      'savings_goals',
+      data,
       where: 'id = ?',
       whereArgs: [id],
     );
   }
 
-  Future<int> updateUserProfile(String id, String name, String avatarUrl) async {
+  Future<int> deleteSavingsGoal(String id) async {
+    final db = await instance.database;
+    return await db.delete('savings_goals', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateUserProfile(
+    String id,
+    String name,
+    String avatarUrl,
+  ) async {
     final db = await instance.database;
     return await db.update(
       'users',
@@ -389,10 +499,97 @@ class DatabaseHelper {
     );
   }
 
+  Future<int> updateUserProfileFull(Map<String, dynamic> data) async {
+    final db = await instance.database;
+    return await db.update(
+      'users',
+      data,
+      where: 'id = ?',
+      whereArgs: [data['id']],
+    );
+  }
+
+  /// Lấy giao dịch trong khoảng thời gian, kèm tên danh mục.
+  Future<List<Map<String, dynamic>>> getTransactionsInRange(
+    String userId,
+    DateTime start,
+    DateTime end,
+  ) async {
+    final db = await instance.database;
+    final startStr = _formatDate(start);
+    final endStr = _formatDate(end);
+
+    return db.rawQuery('''
+      SELECT t.id, t.title, t.amount, t.type, t.date, t.note,
+             t.category_id, t.user_id, c.name AS category_name
+      FROM transactions t
+      LEFT JOIN categories c ON t.category_id = c.id
+      WHERE t.user_id = ?
+        AND t.date >= ?
+        AND t.date <= ?
+      ORDER BY t.date DESC
+    ''', [userId, startStr, endStr]);
+  }
+
+  /// Tổng hợp thu/chi theo tháng trong năm.
+  Future<List<Map<String, dynamic>>> getMonthlyAggregates(
+    String userId,
+    int year,
+  ) async {
+    final db = await instance.database;
+    return db.rawQuery('''
+      SELECT
+        CAST(substr(date, 6, 2) AS INTEGER) AS month,
+        type,
+        SUM(amount) AS total
+      FROM transactions
+      WHERE user_id = ?
+        AND substr(date, 1, 4) = ?
+      GROUP BY month, type
+      ORDER BY month ASC
+    ''', [userId, year.toString()]);
+  }
+
+  Future<Map<String, dynamic>?> getSettings() async {
+    final db = await instance.database;
+    final maps = await db.query('settings', where: 'id = ?', whereArgs: [1]);
+    if (maps.isNotEmpty) return maps.first;
+    return null;
+  }
+
+  Future<int> upsertSettings(Map<String, dynamic> settings) async {
+    final db = await instance.database;
+    return db.insert(
+      'settings',
+      {...settings, 'id': 1},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
   Future<void> close() async {
     final db = _database;
     if (db != null) {
       await db.close();
     }
+  }
+
+  Future<int> updateTransaction(
+    String id,
+    Map<String, dynamic> transactionData,
+  ) async {
+    final db = await database;
+
+    return await db.update(
+      'transactions',
+      transactionData,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }

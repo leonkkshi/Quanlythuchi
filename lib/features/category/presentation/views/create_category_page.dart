@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../application/providers/category_provider.dart';
 
@@ -20,26 +21,26 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
 
-  int _selectedIconCode = 0xe59c; // Default shopping cart
+  int _selectedIconCode = IconlyLight.bag.codePoint; // Default shopping cart
   String _selectedColorHex = '#FDE047'; // Default yellow
 
   final List<int> _iconOptions = [
-    0xe59c, // shopping_cart_outlined
-    0xe1d6, // directions_car_outlined
-    0xe294, // flight_outlined
-    0xf002e, // lunch_dining_outlined
-    0xe104, // cake_outlined
-    0xe342, // icecream_outlined
-    0xf03b6, // cookie_outlined
-    0xea53, // bakery_dining_outlined
-    0xe1d5, // directions_boat_outlined
-    0xe1f3, // donut_large_outlined
-    0xe6a8, // videocam_outlined
-    0xe393, // local_cafe_outlined
-    0xf01b9, // star_outline_rounded
-    0xf581, // checkroom_outlined (dress)
-    0xe80c, // school_outlined (school/pants alternative)
-    0xe38f, // local_bar_outlined (wine glass)
+    IconlyLight.bag.codePoint,
+    IconlyLight.buy.codePoint,
+    IconlyLight.camera.codePoint,
+    IconlyLight.bookmark.codePoint,
+    IconlyLight.call.codePoint,
+    IconlyLight.chat.codePoint,
+    IconlyLight.calendar.codePoint,
+    IconlyLight.discovery.codePoint,
+    IconlyLight.document.codePoint,
+    IconlyLight.edit.codePoint,
+    IconlyLight.folder.codePoint,
+    IconlyLight.game.codePoint,
+    IconlyLight.graph.codePoint,
+    IconlyLight.heart.codePoint,
+    IconlyLight.home.codePoint,
+    IconlyLight.image.codePoint,
   ];
 
   final List<String> _colorOptions = [
@@ -58,7 +59,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -101,7 +102,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
       backgroundColor: isDark ? const Color(0xFF020617) : Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+          icon: Icon(IconlyLight.arrow_left_2, color: primaryColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -164,7 +165,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
                           ),
                         ],
                       ),
-                      const Divider(height: 1),
+                      
                       const SizedBox(height: 24),
 
                       // 2. Biểu tượng Section
