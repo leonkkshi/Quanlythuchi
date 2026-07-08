@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../widgets/budget_progress_bar.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
@@ -340,29 +341,11 @@ class _BudgetViewState extends State<BudgetView> {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: totalProgress,
-                                      minHeight: 8,
-                                      backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                                      valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '${totalPercentage.toStringAsFixed(0)} %',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                  ),
-                                ),
-                              ],
+                            BudgetProgressBar(
+                              progress: totalProgress,
+                              percentage: '${totalPercentage.toStringAsFixed(0)} %',
+                              color: primaryColor,
+                              isDark: isDark,
                             ),
                             const SizedBox(height: 6),
                             Row(
@@ -470,29 +453,11 @@ class _BudgetViewState extends State<BudgetView> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: LinearProgressIndicator(
-                                        value: progress,
-                                        minHeight: 8,
-                                        backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                                        valueColor: AlwaysStoppedAnimation<Color>(catColor),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${percentage.toStringAsFixed(0)} %',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                    ),
-                                  ),
-                                ],
+                              BudgetProgressBar(
+                                progress: progress,
+                                percentage: '${percentage.toStringAsFixed(0)} %',
+                                color: catColor,
+                                isDark: isDark,
                               ),
                               const SizedBox(height: 6),
                               Row(
