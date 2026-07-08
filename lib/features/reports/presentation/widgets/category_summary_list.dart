@@ -1,6 +1,7 @@
 // lib/features/reports/presentation/widgets/category_summary_list.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 import '../../domain/entities/category_summary.dart';
 import '../../../../widgets/currency_formatter.dart';
@@ -48,7 +49,7 @@ class CategorySummaryList extends StatelessWidget {
           leading: CircleAvatar(
             radius: 18,
             backgroundColor: color.withOpacity(0.15),
-            child: Icon(Icons.category_rounded, color: color, size: 18),
+            child: Icon(IconlyBold.category, color: color, size: 18),
           ),
           title: Text(
             item.category,

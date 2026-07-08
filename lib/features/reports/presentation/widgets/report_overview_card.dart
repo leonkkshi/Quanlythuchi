@@ -1,6 +1,7 @@
 // lib/features/reports/presentation/widgets/report_overview_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 import '../../../../widgets/currency_formatter.dart';
 
@@ -41,21 +42,21 @@ class ReportOverviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _MetricRow(
-              icon: Icons.arrow_downward_rounded,
+              icon: IconlyLight.arrow_down,
               iconColor: Colors.green,
               label: 'Tổng thu',
               value: CurrencyFormatter.format(totalIncome, currency),
             ),
             const SizedBox(height: 12),
             _MetricRow(
-              icon: Icons.arrow_upward_rounded,
+              icon: IconlyLight.arrow_up,
               iconColor: Colors.redAccent,
               label: 'Tổng chi',
               value: CurrencyFormatter.format(totalExpense, currency),
             ),
             const Divider(height: 28),
             _MetricRow(
-              icon: Icons.account_balance_wallet_outlined,
+              icon: IconlyLight.wallet,
               iconColor: theme.colorScheme.primary,
               label: 'Số dư',
               value: CurrencyFormatter.format(balance, currency),

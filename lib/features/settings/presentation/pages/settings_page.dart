@@ -1,6 +1,7 @@
 // lib/features/settings/presentation/pages/settings_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
       applicationName: 'Quản Lý Thu Chi',
       applicationVersion: 'v1.2.0',
       applicationIcon: Icon(
-        Icons.account_balance_wallet_rounded,
+        IconlyBold.wallet,
         size: 48,
         color: Colors.orange[800],
       ),
@@ -99,18 +100,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 _SettingsCard(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.person_outline),
+                      leading: const Icon(IconlyLight.profile),
                       title: const Text('Hồ sơ cá nhân'),
                       subtitle: const Text('Xem và chỉnh sửa thông tin'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                      trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: () => context.push(AppRouter.profile),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.category_outlined),
+                      leading: const Icon(IconlyLight.category),
                       title: const Text('Quản lý danh mục'),
                       subtitle: const Text('Tùy chỉnh đề mục chi tiêu & thu nhập'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                      trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: () => context.push(AppRouter.categories),
                     ),
                   ],
@@ -119,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _SettingsCard(
                   children: [
                     SwitchListTile(
-                      secondary: const Icon(Icons.dark_mode_outlined),
+                      secondary: const Icon(IconlyLight.show),
                       title: const Text('Dark Mode'),
                       subtitle: const Text('Bật/Tắt giao diện tối'),
                       value: themeProvider.isDarkMode,
@@ -130,7 +131,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.payments_outlined),
+                      leading: const Icon(IconlyLight.wallet),
                       title: const Text('Đơn vị tiền tệ'),
                       subtitle: Text(settingsProvider.currency),
                       trailing: DropdownButton<String>(
@@ -153,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const Divider(height: 1),
                     SwitchListTile(
-                      secondary: const Icon(Icons.notifications_outlined),
+                      secondary: const Icon(IconlyLight.notification),
                       title: const Text('Thông báo'),
                       subtitle: Text(
                         settingsProvider.notificationEnabled
@@ -169,22 +170,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 _SettingsCard(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.info_outline),
+                      leading: const Icon(IconlyLight.info_square),
                       title: const Text('Giới thiệu'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                      trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: _showAboutDialog,
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.privacy_tip_outlined),
+                      leading: const Icon(IconlyLight.shield_done),
                       title: const Text('Chính sách bảo mật'),
-                      trailing: const Icon(Icons.chevron_right_rounded),
+                      trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: _showPrivacyPolicy,
                     ),
                     const Divider(height: 1),
                     ListTile(
                       leading: const Icon(
-                        Icons.logout_rounded,
+                        IconlyBold.logout,
                         color: Colors.redAccent,
                       ),
                       title: const Text('Đăng xuất'),

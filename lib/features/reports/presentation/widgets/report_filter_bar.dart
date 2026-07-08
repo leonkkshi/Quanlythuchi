@@ -1,6 +1,7 @@
 // lib/features/reports/presentation/widgets/report_filter_bar.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 import '../../domain/entities/report_filter.dart';
 
@@ -67,7 +68,7 @@ class ReportFilterBar extends StatelessWidget {
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onPickDateRange,
-          icon: const Icon(Icons.date_range_rounded, size: 18),
+          icon: const Icon(IconlyLight.calendar, size: 18),
           label: const Text('Chọn khoảng thời gian'),
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(

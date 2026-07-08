@@ -1,6 +1,7 @@
 // lib/features/profile/presentation/pages/edit_profile_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -114,7 +115,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: _nameController,
                     decoration: const InputDecoration(
                       labelText: 'Họ và tên',
-                      prefixIcon: Icon(Icons.person_outline),
+                      prefixIcon: Icon(IconlyLight.profile),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -132,7 +133,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: 'Email',
-                      prefixIcon: Icon(Icons.email_outlined),
+                      prefixIcon: Icon(IconlyLight.message),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -151,7 +152,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     keyboardType: TextInputType.phone,
                     decoration: const InputDecoration(
                       labelText: 'Số điện thoại',
-                      prefixIcon: Icon(Icons.phone_outlined),
+                      prefixIcon: Icon(IconlyLight.call),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -168,7 +169,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: _avatarSeedController,
                     decoration: const InputDecoration(
                       labelText: 'Từ khóa avatar (seed)',
-                      prefixIcon: Icon(Icons.image_outlined),
+                      prefixIcon: Icon(IconlyLight.image),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/routes/app_router.dart';
@@ -33,7 +34,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -111,7 +112,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
           backgroundColor: isDark ? const Color(0xFF020617) : const Color(0xFFF8FAFC),
           appBar: AppBar(
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              icon: const Icon(IconlyLight.arrow_left_2),
               onPressed: () => Navigator.pop(context),
             ),
             title: Row(
@@ -208,7 +209,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                             color: primaryColor.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.add_rounded, color: primaryColor, size: 20),
+                          child: Icon(IconlyBold.plus, color: primaryColor, size: 20),
                         ),
                         title: Text(
                           'Thêm danh mục',
@@ -217,7 +218,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                             color: isDark ? Colors.white : const Color(0xFF1E293B),
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                        trailing: const Icon(IconlyLight.arrow_right_2, color: Color(0xFF94A3B8)),
                         onTap: () => _navigateToAddCategory(context, provider),
                       ),
                     ),
@@ -252,10 +253,10 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                             ),
                             trailing: _isEditMode
                                 ? IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.redAccent),
+                                    icon: const Icon(IconlyLight.delete, color: Colors.redAccent),
                                     onPressed: () => _deleteCategory(context, category, provider),
                                   )
-                                : const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                                : const Icon(IconlyLight.arrow_right_2, color: Color(0xFF94A3B8)),
                           );
                         },
                       ),

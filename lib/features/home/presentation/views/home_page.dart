@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 import '../../../auth/application/services/auth_service_impl.dart';
@@ -101,7 +102,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -154,7 +155,7 @@ class _HomePageState extends State<HomePage> {
     return _TopCategory(
       name: category?.name ?? 'Chưa phân loại',
       amount: top.value,
-      iconCode: category?.iconCode ?? Icons.category_outlined.codePoint,
+      iconCode: category?.iconCode ?? IconlyLight.category.codePoint,
       colorHex: category?.colorHex ?? '#F97316',
     );
   }
@@ -231,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                   child: _buildInsightCard(
                     surfaceColor: surfaceColor,
                     borderColor: borderColor,
-                    icon: Icons.savings_outlined,
+                    icon: IconlyLight.wallet,
                     color: totalBudget >= 0 ? AppColors.tradingUp : AppColors.tradingDown,
                     title: 'Ngân sách tháng',
                     value: totalBudget > 0 ? _formatCurrency(totalBudget) : 'Chưa đặt',
@@ -246,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                   child: _buildInsightCard(
                     surfaceColor: surfaceColor,
                     borderColor: borderColor,
-                    icon: Icons.local_fire_department_outlined,
+                    icon: IconlyLight.discovery,
                     color: topCategory == null
                         ? primaryColor
                         : _getColorFromHex(topCategory.colorHex),
@@ -338,7 +339,7 @@ class _HomePageState extends State<HomePage> {
         IconButton(
           onPressed: _loadDashboardData,
           tooltip: 'Làm mới',
-          icon: Icon(Icons.refresh_rounded, color: primaryColor),
+          icon: Icon(IconlyLight.swap, color: primaryColor),
         ),
       ],
     );
@@ -418,7 +419,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: Icons.arrow_downward_rounded,
+                  icon: IconlyLight.arrow_down,
                   label: 'Tổng thu',
                   value: _formatCurrency(totalIncome),
                   color: AppColors.tradingUp,
@@ -427,7 +428,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 14),
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: Icons.arrow_upward_rounded,
+                  icon: IconlyLight.arrow_up,
                   label: 'Tổng chi',
                   value: _formatCurrency(totalExpense),
                   color: AppColors.tradingDown,
@@ -488,7 +489,7 @@ class _HomePageState extends State<HomePage> {
       children: [
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.add_rounded,
+            icon: IconlyBold.plus,
             label: 'Nhập thu/chi',
             color: primaryColor,
             borderColor: borderColor,
@@ -498,7 +499,7 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 10),
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.calendar_month_rounded,
+            icon: IconlyBold.calendar,
             label: 'Lịch',
             color: AppColors.info,
             borderColor: borderColor,
@@ -508,7 +509,7 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(width: 10),
         Expanded(
           child: _buildQuickActionButton(
-            icon: Icons.pie_chart_rounded,
+            icon: IconlyBold.chart,
             label: 'Báo cáo',
             color: AppColors.tradingDown,
             borderColor: borderColor,
@@ -676,7 +677,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           Icon(
-            Icons.receipt_long_outlined,
+            IconlyLight.document,
             size: 42,
             color: AppColors.primary,
           ),
@@ -698,7 +699,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 14),
           ElevatedButton.icon(
             onPressed: () => widget.onNavigateToTab?.call(1),
-            icon: const Icon(Icons.add_rounded),
+            icon: const Icon(IconlyBold.plus),
             label: const Text('Nhập giao dịch'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -745,7 +746,7 @@ class _HomePageState extends State<HomePage> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              category == null ? Icons.category_outlined : _getIconData(category.iconCode),
+              category == null ? IconlyLight.category : _getIconData(category.iconCode),
               color: color,
               size: 20,
             ),

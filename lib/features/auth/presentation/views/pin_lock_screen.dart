@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,7 +78,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
           children: [
             const Spacer(),
             Icon(
-              Icons.lock_rounded,
+              IconlyBold.lock,
               size: 64,
               color: accent,
             ),
@@ -193,7 +194,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
       height: 72,
       child: IconButton(
         icon: Icon(
-          Icons.backspace_outlined,
+          IconlyLight.delete,
           size: 26,
           color: theme.colorScheme.onSurface.withOpacity(0.72),
         ),

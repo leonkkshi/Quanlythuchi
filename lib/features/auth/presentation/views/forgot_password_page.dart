@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
@@ -62,7 +63,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
           builder: (context) => AlertDialog(
             title: const Row(
               children: [
-                Icon(Icons.check_circle_rounded, color: Colors.green),
+                Icon(IconlyBold.tick_square, color: Colors.green),
                 SizedBox(width: 8),
                 Text('Thành công'),
               ],
@@ -132,7 +133,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: Icon(
-                              Icons.lock_reset_rounded,
+                              IconlyBold.password,
                               color: primaryColor,
                               size: 32,
                             ),
@@ -181,7 +182,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                                   decoration: const InputDecoration(
                                     labelText: 'Email tài khoản',
                                     hintText: 'Nhập email cần đặt lại',
-                                    prefixIcon: Icon(Icons.email_outlined),
+                                    prefixIcon: Icon(IconlyLight.message),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.trim().isEmpty) {
@@ -198,12 +199,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                                   decoration: InputDecoration(
                                     labelText: 'Mật khẩu mới',
                                     hintText: 'Nhập mật khẩu mới (tối thiểu 6 ký tự)',
-                                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                                    prefixIcon: const Icon(IconlyLight.lock),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
+                                            ? IconlyLight.hide
+                                            : IconlyLight.show,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -230,12 +231,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                                   decoration: InputDecoration(
                                     labelText: 'Xác nhận mật khẩu mới',
                                     hintText: 'Nhập lại mật khẩu mới',
-                                    prefixIcon: const Icon(Icons.lock_reset_rounded),
+                                    prefixIcon: const Icon(IconlyBold.password),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscureConfirmPassword
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
+                                            ? IconlyLight.hide
+                                            : IconlyLight.show,
                                       ),
                                       onPressed: () {
                                         setState(() {

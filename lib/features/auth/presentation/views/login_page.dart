@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Icon(
-                          Icons.account_balance_wallet_rounded,
+                          IconlyBold.wallet,
                           color: primaryColor,
                           size: 36,
                         ),
@@ -152,7 +153,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               decoration: const InputDecoration(
                                 labelText: 'Email',
                                 hintText: 'Nhập email của bạn',
-                                prefixIcon: Icon(Icons.email_outlined),
+                                prefixIcon: Icon(IconlyLight.message),
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
@@ -169,12 +170,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               decoration: InputDecoration(
                                 labelText: 'Mật khẩu',
                                 hintText: 'Nhập mật khẩu',
-                                prefixIcon: const Icon(Icons.lock_outline_rounded),
+                                prefixIcon: const Icon(IconlyLight.lock),
                                 suffixIcon: IconButton(
                                   icon: Icon(
                                     _obscurePassword
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
+                                        ? IconlyLight.hide
+                                        : IconlyLight.show,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -244,7 +245,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.info_outline_rounded, size: 18, color: primaryColor),
+                                Icon(IconlyLight.info_square, size: 18, color: primaryColor),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Tài khoản demo:',

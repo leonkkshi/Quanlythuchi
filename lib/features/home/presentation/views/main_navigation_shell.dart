@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../category/presentation/views/budget_view.dart';
@@ -80,33 +81,33 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
           elevation: 0,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined, size: 24),
-              activeIcon: Icon(Icons.dashboard_rounded, size: 24),
+              icon: Icon(IconlyLight.home, size: 24),
+              activeIcon: Icon(IconlyBold.home, size: 24),
               label: 'Tổng quan',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.edit_note_rounded, size: 28),
-              activeIcon: Icon(Icons.edit_note_rounded, size: 28),
+              icon: Icon(IconlyBold.edit, size: 28),
+              activeIcon: Icon(IconlyBold.edit, size: 28),
               label: 'Nhập vào',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_outlined, size: 24),
-              activeIcon: Icon(Icons.calendar_month_rounded, size: 24),
+              icon: Icon(IconlyLight.calendar, size: 24),
+              activeIcon: Icon(IconlyBold.calendar, size: 24),
               label: 'Lịch',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart_outline_rounded, size: 24),
-              activeIcon: Icon(Icons.pie_chart_rounded, size: 24),
+              icon: Icon(IconlyLight.chart, size: 24),
+              activeIcon: Icon(IconlyBold.chart, size: 24),
               label: 'Báo cáo',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_balance_wallet_outlined, size: 24),
-              activeIcon: Icon(Icons.account_balance_wallet_rounded, size: 24),
+              icon: Icon(IconlyLight.wallet, size: 24),
+              activeIcon: Icon(IconlyBold.wallet, size: 24),
               label: 'Ngân sách',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.more_horiz_rounded, size: 26),
-              activeIcon: Icon(Icons.more_horiz_rounded, size: 26),
+              icon: Icon(IconlyBold.more_circle, size: 26),
+              activeIcon: Icon(IconlyBold.more_circle, size: 26),
               label: 'Khác',
             ),
           ],

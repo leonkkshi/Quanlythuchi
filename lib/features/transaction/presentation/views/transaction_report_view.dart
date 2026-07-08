@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
@@ -57,7 +58,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -148,7 +149,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.photo_library_outlined, color: primaryColor),
+              icon: Icon(IconlyLight.image, color: primaryColor),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Tính năng lưu báo cáo hình ảnh đang phát triển.')),
@@ -215,7 +216,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: Icon(Icons.search_rounded, color: primaryColor),
+                icon: Icon(IconlyLight.search, color: primaryColor),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Tính năng tìm kiếm báo cáo đang phát triển.')),
@@ -242,7 +243,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_left_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(-1),
                       ),
                       Text(
@@ -256,7 +257,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_right_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(1),
                       ),
                     ],
@@ -529,7 +530,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
                               : null;
 
                           final catName = category != null ? category.name : 'Chưa phân loại';
-                          final catIconCode = category != null ? category.iconCode : 0xe532;
+                          final catIconCode = category != null ? category.iconCode : IconlyLight.category.codePoint;
                           final catColorHex = category != null ? category.colorHex : '#94A3B8';
                           final catColor = _getColorFromHex(catColorHex);
 
@@ -580,7 +581,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
                                 ),
                                 const SizedBox(width: 8),
                                 const Icon(
-                                  Icons.chevron_right_rounded,
+                                  IconlyLight.arrow_right_2,
                                   color: Color(0xFFCBD5E1),
                                   size: 20,
                                 ),

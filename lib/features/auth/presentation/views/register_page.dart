@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
@@ -120,7 +121,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: Icon(
-                              Icons.person_add_alt_1_rounded,
+                              IconlyBold.add_user,
                               color: primaryColor,
                               size: 32,
                             ),
@@ -169,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   decoration: const InputDecoration(
                                     labelText: 'Họ và tên',
                                     hintText: 'Nhập họ tên đầy đủ',
-                                    prefixIcon: Icon(Icons.person_outline_rounded),
+                                    prefixIcon: Icon(IconlyLight.profile),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.trim().isEmpty) {
@@ -186,7 +187,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   decoration: const InputDecoration(
                                     labelText: 'Email',
                                     hintText: 'Nhập địa chỉ email',
-                                    prefixIcon: Icon(Icons.email_outlined),
+                                    prefixIcon: Icon(IconlyLight.message),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.trim().isEmpty) {
@@ -203,12 +204,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   decoration: InputDecoration(
                                     labelText: 'Mật khẩu',
                                     hintText: 'Nhập mật khẩu (tối thiểu 6 ký tự)',
-                                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                                    prefixIcon: const Icon(IconlyLight.lock),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscurePassword
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
+                                            ? IconlyLight.hide
+                                            : IconlyLight.show,
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -235,12 +236,12 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   decoration: InputDecoration(
                                     labelText: 'Xác nhận mật khẩu',
                                     hintText: 'Nhập lại mật khẩu',
-                                    prefixIcon: const Icon(Icons.lock_reset_rounded),
+                                    prefixIcon: const Icon(IconlyBold.password),
                                     suffixIcon: IconButton(
                                       icon: Icon(
                                         _obscureConfirmPassword
-                                            ? Icons.visibility_off_outlined
-                                            : Icons.visibility_outlined,
+                                            ? IconlyLight.hide
+                                            : IconlyLight.show,
                                       ),
                                       onPressed: () {
                                         setState(() {

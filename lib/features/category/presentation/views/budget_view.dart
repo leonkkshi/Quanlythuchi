@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../../transaction/application/providers/transaction_provider.dart';
@@ -56,7 +57,7 @@ class _BudgetViewState extends State<BudgetView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -218,7 +219,7 @@ class _BudgetViewState extends State<BudgetView> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.photo_library_outlined, color: primaryColor),
+              icon: Icon(IconlyLight.image, color: primaryColor),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Tính năng lưu hình ảnh đang phát triển.')),
@@ -229,7 +230,7 @@ class _BudgetViewState extends State<BudgetView> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: Icon(Icons.tune_rounded, color: primaryColor),
+                icon: Icon(IconlyLight.filter, color: primaryColor),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Tính năng lọc đang phát triển.')),
@@ -256,7 +257,7 @@ class _BudgetViewState extends State<BudgetView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_left_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(-1),
                       ),
                       Text(
@@ -268,7 +269,7 @@ class _BudgetViewState extends State<BudgetView> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_right_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(1),
                       ),
                     ],
@@ -330,7 +331,7 @@ class _BudgetViewState extends State<BudgetView> {
                                       ),
                                     const SizedBox(width: 4),
                                     const Icon(
-                                      Icons.chevron_right_rounded,
+                                      IconlyLight.arrow_right_2,
                                       color: Color(0xFFCBD5E1),
                                       size: 20,
                                     ),
@@ -462,7 +463,7 @@ class _BudgetViewState extends State<BudgetView> {
                                     ),
                                   const SizedBox(width: 4),
                                   const Icon(
-                                    Icons.chevron_right_rounded,
+                                    IconlyLight.arrow_right_2,
                                     color: Color(0xFFCBD5E1),
                                     size: 20,
                                   ),

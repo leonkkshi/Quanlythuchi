@@ -1,6 +1,7 @@
 // lib/widgets/async_state_view.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 
 /// Widget hiển thị loading / empty / error state dùng chung.
 class AsyncStateView extends StatelessWidget {
@@ -21,7 +22,7 @@ class AsyncStateView extends StatelessWidget {
     this.errorMessage,
     this.emptyTitle = 'Không có dữ liệu',
     this.emptySubtitle = 'Hãy thêm giao dịch để xem báo cáo.',
-    this.emptyIcon = Icons.inbox_outlined,
+    this.emptyIcon = IconlyLight.document,
     this.onRetry,
   });
 
@@ -43,7 +44,7 @@ class AsyncStateView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+              Icon(IconlyLight.danger, size: 48, color: Colors.red[300]),
               const SizedBox(height: 12),
               Text(
                 errorMessage!,
@@ -54,7 +55,7 @@ class AsyncStateView extends StatelessWidget {
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
                   onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
+                  icon: const Icon(IconlyLight.swap),
                   label: const Text('Thử lại'),
                 ),
               ],

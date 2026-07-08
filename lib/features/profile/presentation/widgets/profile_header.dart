@@ -1,6 +1,7 @@
 // lib/features/profile/presentation/widgets/profile_header.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 
 import '../../domain/entities/user_profile.dart';
@@ -45,17 +46,17 @@ class ProfileHeader extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _InfoTile(
-              icon: Icons.email_outlined,
+              icon: IconlyLight.message,
               label: 'Email',
               value: profile.email,
             ),
             _InfoTile(
-              icon: Icons.phone_outlined,
+              icon: IconlyLight.call,
               label: 'Điện thoại',
               value: profile.phone ?? 'Chưa cập nhật',
             ),
             _InfoTile(
-              icon: Icons.calendar_month_outlined,
+              icon: IconlyLight.calendar,
               label: 'Thành viên từ',
               value: memberSince,
             ),

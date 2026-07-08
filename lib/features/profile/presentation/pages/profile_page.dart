@@ -1,6 +1,7 @@
 // lib/features/profile/presentation/pages/profile_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -100,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       await context.push(AppRouter.editProfile);
                       if (mounted) _loadProfile();
                     },
-                    icon: const Icon(Icons.edit_outlined),
+                    icon: const Icon(IconlyLight.edit),
                     label: const Text('Chỉnh sửa hồ sơ'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange[800],
@@ -109,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: _logout,
-                    icon: const Icon(Icons.logout_rounded, color: Colors.red),
+                    icon: const Icon(IconlyBold.logout, color: Colors.red),
                     label: const Text(
                       'Đăng xuất',
                       style: TextStyle(color: Colors.red),
