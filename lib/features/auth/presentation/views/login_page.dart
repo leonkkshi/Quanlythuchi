@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
 import '../viewmodels/login_view_model.dart';
-import '../../../../app/routes/app_routes.dart';
+import '../../../../app/routes/app_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -51,7 +52,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       );
       if (success && mounted) {
         // Redirect to home screen and clear route stack
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        context.go(AppRouter.home);
       }
     }
   }
@@ -276,7 +277,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                            alignment: Alignment.centerRight,
                                            child: TextButton(
                                              onPressed: () {
-                                               Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                                               context.push(AppRouter.forgotPassword);
                                              },
                                              style: TextButton.styleFrom(
                                                padding: EdgeInsets.zero,
@@ -377,7 +378,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                    ),
                                    GestureDetector(
                                      onTap: () {
-                                       Navigator.pushNamed(context, AppRoutes.register);
+                                       context.push(AppRouter.register);
                                      },
                                      child: Text(
                                        'Đăng ký ngay',

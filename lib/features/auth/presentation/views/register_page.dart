@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
 import '../viewmodels/register_view_model.dart';
-import '../../../../app/routes/app_routes.dart';
+import '../../../../app/routes/app_router.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -66,7 +67,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        context.go(AppRouter.home);
       }
     }
   }
@@ -369,7 +370,7 @@ class _RegisterPageState extends State<RegisterPage> with SingleTickerProviderSt
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                                      context.go(AppRouter.login);
                                     },
                                     child: Text(
                                       'Đăng nhập ngay',

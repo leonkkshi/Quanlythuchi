@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../app/routes/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes/app_router.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../application/providers/transaction_provider.dart';
@@ -326,10 +327,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                             context,
                             listen: false,
                           );
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.categories,
-                          ).then((_) {
+                          context.push(AppRouter.categories).then((_) {
                             if (_userId != null) {
                               catProv.loadCategories(_userId!);
                             }
@@ -570,10 +568,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                                     context,
                                     listen: false,
                                   );
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.categories,
-                                  ).then((_) {
+                                  context.push(AppRouter.categories).then((_) {
                                     if (_userId != null) {
                                       catProv.loadCategories(_userId!);
                                     }

@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../application/services/auth_service_impl.dart';
 import '../viewmodels/forgot_password_view_model.dart';
-import '../../../../app/routes/app_routes.dart';
+import '../../../../app/routes/app_router.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -78,7 +79,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
           ),
         );
         if (mounted) {
-          Navigator.pushReplacementNamed(context, AppRoutes.login);
+          context.go(AppRouter.login);
         }
       }
     }
@@ -363,7 +364,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                                      context.go(AppRouter.login);
                                     },
                                     child: Text(
                                       'Đăng nhập',

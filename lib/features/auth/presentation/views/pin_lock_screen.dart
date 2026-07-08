@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../app/routes/app_router.dart';
 
 class PinLockScreen extends StatefulWidget {
   const PinLockScreen({super.key});
@@ -44,7 +47,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
 
     if (currentPinStr == savedPin) {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        context.go(AppRouter.home);
       }
     } else {
       setState(() {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../../app/routes/app_router.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../application/providers/category_provider.dart';
 import '../../domain/entities/category.dart';
@@ -46,10 +48,9 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
   void _navigateToAddCategory(BuildContext context, CategoryProvider provider) async {
     if (_userId == null) return;
     
-    final success = await Navigator.pushNamed(
-      context,
-      '/create-category',
-      arguments: {'type': _activeTab, 'userId': _userId},
+    final success = await context.push<bool>(
+      AppRouter.createCategory,
+      extra: {'type': _activeTab, 'userId': _userId},
     );
     
     if (success == true && context.mounted) {
