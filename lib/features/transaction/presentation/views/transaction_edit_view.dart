@@ -341,7 +341,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                   ),
                 ),
 
-                const Divider(height: 1),
+                
 
                 // 2. Form Inputs (Date, Note, Amount)
                 Expanded(

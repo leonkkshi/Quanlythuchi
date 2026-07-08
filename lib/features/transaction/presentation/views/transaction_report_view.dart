@@ -519,7 +519,7 @@ class _TransactionReportViewState extends State<TransactionReportView> {
                     ? const SizedBox()
                     : ListView.separated(
                         itemCount: summaryList.length,
-                        separatorBuilder: (context, index) => const Divider(height: 1),
+                        separatorBuilder: (context, index) => const SizedBox.shrink(),
                         itemBuilder: (context, index) {
                           final summary = summaryList[index];
                           

@@ -391,7 +391,7 @@ class _BudgetViewState extends State<BudgetView> {
                       ),
                     ),
 
-                    const Divider(height: 24, thickness: 1),
+                    
 
                     // Individual Categories Budgets
                     ...categories.map((cat) {

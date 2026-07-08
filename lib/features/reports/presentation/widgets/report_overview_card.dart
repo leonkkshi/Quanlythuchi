@@ -42,19 +42,19 @@ class ReportOverviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _MetricRow(
-              icon: IconlyLight.arrow_down,
+              icon: IconlyBold.download,
               iconColor: Colors.green,
               label: 'Tổng thu',
               value: CurrencyFormatter.format(totalIncome, currency),
             ),
             const SizedBox(height: 12),
             _MetricRow(
-              icon: IconlyLight.arrow_up,
+              icon: IconlyBold.upload,
               iconColor: Colors.redAccent,
               label: 'Tổng chi',
               value: CurrencyFormatter.format(totalExpense, currency),
             ),
-            const Divider(height: 28),
+            
             _MetricRow(
               icon: IconlyLight.wallet,
               iconColor: theme.colorScheme.primary,

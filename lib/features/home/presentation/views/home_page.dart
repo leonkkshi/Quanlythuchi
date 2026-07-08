@@ -418,7 +418,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: IconlyLight.arrow_down,
+                  icon: IconlyBold.download,
                   label: 'Tổng thu',
                   value: _formatCurrency(totalIncome),
                   color: AppColors.tradingUp,
@@ -427,7 +427,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 14),
               Expanded(
                 child: _buildMoneyMiniStat(
-                  icon: IconlyLight.arrow_up,
+                  icon: IconlyBold.upload,
                   label: 'Tổng chi',
                   value: _formatCurrency(totalExpense),
                   color: AppColors.tradingDown,

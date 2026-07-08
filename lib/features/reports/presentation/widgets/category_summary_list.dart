@@ -39,7 +39,7 @@ class CategorySummaryList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: data.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, __) => const SizedBox.shrink(),
       itemBuilder: (context, index) {
         final item = data[index];
         final color = _colors[index % _colors.length];

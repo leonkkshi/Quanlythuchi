@@ -121,7 +121,7 @@ class AppTheme {
         backgroundColor: AppColors.surfaceCardDark,
         contentTextStyle: TextStyle(color: AppColors.bodyOnDark),
       ),
-      dividerColor: AppColors.hairlineOnLight,
+      dividerColor: Colors.transparent,
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.canvasLight,
         selectedItemColor: AppColors.primary,
@@ -225,7 +225,7 @@ class AppTheme {
         backgroundColor: AppColors.surfaceCardDark,
         contentTextStyle: TextStyle(color: AppColors.bodyOnDark),
       ),
-      dividerColor: AppColors.hairlineOnDark,
+      dividerColor: Colors.transparent,
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surfaceCardDark,
         selectedItemColor: AppColors.primary,

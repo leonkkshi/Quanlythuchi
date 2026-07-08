@@ -106,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: () => context.push(AppRouter.profile),
                     ),
-                    const Divider(height: 1),
+                    
                     ListTile(
                       leading: const Icon(IconlyLight.category),
                       title: const Text('Quản lý danh mục'),
@@ -129,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         settingsProvider.saveThemePreference(value);
                       },
                     ),
-                    const Divider(height: 1),
+                    
                     ListTile(
                       leading: const Icon(IconlyLight.wallet),
                       title: const Text('Đơn vị tiền tệ'),
@@ -152,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         },
                       ),
                     ),
-                    const Divider(height: 1),
+                    
                     SwitchListTile(
                       secondary: const Icon(IconlyLight.notification),
                       title: const Text('Thông báo'),
@@ -175,14 +175,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: _showAboutDialog,
                     ),
-                    const Divider(height: 1),
+                    
                     ListTile(
                       leading: const Icon(IconlyLight.shield_done),
                       title: const Text('Chính sách bảo mật'),
                       trailing: const Icon(IconlyLight.arrow_right_2),
                       onTap: _showPrivacyPolicy,
                     ),
-                    const Divider(height: 1),
+                    
                     ListTile(
                       leading: const Icon(
                         IconlyBold.logout,

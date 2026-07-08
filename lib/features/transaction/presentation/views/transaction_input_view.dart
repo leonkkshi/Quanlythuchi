@@ -302,7 +302,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                   ),
                 ),
 
-                const Divider(height: 1),
+                
 
                 // 2. Form Inputs (Date, Note, Amount)
                 Expanded(

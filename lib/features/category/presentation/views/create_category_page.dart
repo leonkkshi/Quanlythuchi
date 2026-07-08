@@ -165,7 +165,7 @@ class _CreateCategoryPageState extends State<CreateCategoryPage> {
                           ),
                         ],
                       ),
-                      const Divider(height: 1),
+                      
                       const SizedBox(height: 24),
 
                       // 2. Biểu tượng Section

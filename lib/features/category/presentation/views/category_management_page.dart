@@ -233,7 +233,7 @@ class _CategoryManagementPageState extends State<CategoryManagementPage> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: categories.length,
-                        separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                        separatorBuilder: (context, index) => const SizedBox.shrink(),
                         itemBuilder: (context, index) {
                           final category = categories[index];
                           final color = _getColorFromHex(category.colorHex);
