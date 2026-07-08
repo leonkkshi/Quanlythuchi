@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../../category/application/providers/category_provider.dart';
@@ -100,7 +101,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -283,7 +284,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(Icons.search_rounded, color: Colors.orange),
+                icon: const Icon(IconlyLight.search, color: Colors.orange),
                 onPressed: () {
                   _showSearchDialog(txProvider);
                 },
@@ -316,7 +317,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                     children: [
                       IconButton(
                         icon: const Icon(
-                          Icons.chevron_left_rounded,
+                          IconlyLight.arrow_left_2,
                           color: Color(0xFF94A3B8),
                         ),
                         onPressed: () => _changeMonth(-1),
@@ -333,7 +334,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                       ),
                       IconButton(
                         icon: const Icon(
-                          Icons.chevron_right_rounded,
+                          IconlyLight.arrow_right_2,
                           color: Color(0xFF94A3B8),
                         ),
                         onPressed: () => _changeMonth(1),
@@ -639,8 +640,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                       )
                     : ListView.separated(
                         itemCount: selectedDayTxs.length,
-                        separatorBuilder: (context, index) =>
-                            const Divider(height: 1),
+                        separatorBuilder: (context, index) => const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final tx = selectedDayTxs[index];
 
@@ -659,7 +659,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                               : 'Chưa phân loại';
                           final catIconCode = category != null
                               ? category.iconCode
-                              : 0xe532;
+                              : IconlyLight.category.codePoint;
                           final catColorHex = category != null
                               ? category.colorHex
                               : '#94A3B8';
@@ -684,7 +684,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
 
                                 final user = await authService.getCurrentUser();
 
-                                if (user != null) {
+                                if (user != null && context.mounted) {
                                   await Provider.of<TransactionProvider>(
                                     context,
                                     listen: false,
@@ -741,7 +741,7 @@ class _TransactionCalendarViewState extends State<TransactionCalendarView> {
                                 ),
                                 const SizedBox(width: 8),
                                 const Icon(
-                                  Icons.chevron_right_rounded,
+                                  IconlyLight.arrow_right_2,
                                   color: Color(0xFFCBD5E1),
                                   size: 20,
                                 ),

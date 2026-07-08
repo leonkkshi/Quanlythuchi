@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../app/routes/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes/app_router.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../application/providers/transaction_provider.dart';
@@ -163,7 +165,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -326,23 +328,20 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                             context,
                             listen: false,
                           );
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.categories,
-                          ).then((_) {
+                          context.push(AppRouter.categories).then((_) {
                             if (_userId != null) {
                               catProv.loadCategories(_userId!);
                             }
                           });
                         },
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(IconlyLight.edit),
                         color: isDark ? Colors.white : const Color(0xFF64748B),
                       ),
                     ],
                   ),
                 ),
 
-                const Divider(height: 1),
+                
 
                 // 2. Form Inputs (Date, Note, Amount)
                 Expanded(
@@ -385,7 +384,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                                   children: [
                                     IconButton(
                                       icon: const Icon(
-                                        Icons.chevron_left_rounded,
+                                        IconlyLight.arrow_left_2,
                                         size: 20,
                                       ),
                                       onPressed: () => _adjustDate(-1),
@@ -409,7 +408,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                                     ),
                                     IconButton(
                                       icon: const Icon(
-                                        Icons.chevron_right_rounded,
+                                        IconlyLight.arrow_right_2,
                                         size: 20,
                                       ),
                                       onPressed: () => _adjustDate(1),
@@ -570,10 +569,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                                     context,
                                     listen: false,
                                   );
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.categories,
-                                  ).then((_) {
+                                  context.push(AppRouter.categories).then((_) {
                                     if (_userId != null) {
                                       catProv.loadCategories(_userId!);
                                     }
@@ -592,7 +588,7 @@ class _EditTransactionViewState extends State<EditTransactionView> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.chevron_right_rounded,
+                                        IconlyLight.arrow_right_2,
                                         size: 24,
                                         color: Color(0xFF94A3B8),
                                       ),

@@ -1,11 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:iconly/iconly.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
-import '../../../../app/routes/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/routes/app_router.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../application/providers/transaction_provider.dart';
+import 'package:intl/intl.dart';
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    } else if (newValue.text.compareTo(oldValue.text) != 0) {
+      final int selectionIndexFromTheRight =
+          newValue.text.length - newValue.selection.end;
+      final numberString = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+      if (numberString.isEmpty) return newValue.copyWith(text: '');
+      final number = int.parse(numberString);
+      final newString = NumberFormat.decimalPattern('vi_VN').format(number).replaceAll(',', '.');
+      return TextEditingValue(
+        text: newString,
+        selection: TextSelection.collapsed(
+            offset: newString.length - selectionIndexFromTheRight),
+      );
+    } else {
+      return newValue;
+    }
+  }
+}
 
 class TransactionInputView extends StatefulWidget {
   const TransactionInputView({super.key});
@@ -139,7 +166,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -166,7 +193,8 @@ class _TransactionInputViewState extends State<TransactionInputView> {
       return;
     }
 
-    final double? amount = double.tryParse(_amountController.text);
+    final cleanAmountStr = _amountController.text.replaceAll('.', '').replaceAll(',', '');
+    final double? amount = double.tryParse(cleanAmountStr);
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng nhập số tiền lớn hơn 0.')),
@@ -287,20 +315,20 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                       IconButton(
                         onPressed: () {
                           final catProv = Provider.of<CategoryProvider>(context, listen: false);
-                          Navigator.pushNamed(context, AppRoutes.categories).then((_) {
+                          context.push(AppRouter.categories).then((_) {
                             if (_userId != null) {
                               catProv.loadCategories(_userId!);
                             }
                           });
                         },
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(IconlyLight.edit),
                         color: isDark ? Colors.white : const Color(0xFF64748B),
                       ),
                     ],
                   ),
                 ),
 
-                const Divider(height: 1),
+                
 
                 // 2. Form Inputs (Date, Note, Amount)
                 Expanded(
@@ -337,7 +365,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.chevron_left_rounded, size: 20),
+                                      icon: const Icon(IconlyLight.arrow_left_2, size: 20),
                                       onPressed: () => _adjustDate(-1),
                                     ),
                                     Expanded(
@@ -356,7 +384,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.chevron_right_rounded, size: 20),
+                                      icon: const Icon(IconlyLight.arrow_right_2, size: 20),
                                       onPressed: () => _adjustDate(1),
                                     ),
                                   ],
@@ -415,14 +443,22 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                             ),
                             Expanded(
                               child: Container(
-                                height: 44,
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                height: 56,
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 decoration: BoxDecoration(
                                   color: isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFBEB),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFFEF3C7),
+                                    color: isDark ? const Color(0xFF334155) : const Color(0xFFFDE68A),
+                                    width: 1.5,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (isDark ? Colors.black : const Color(0xFFFDE68A)).withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
                                 child: Row(
                                   children: [
@@ -432,15 +468,17 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                                         keyboardType: TextInputType.number,
                                         textAlign: TextAlign.right,
                                         inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly
+                                          FilteringTextInputFormatter.digitsOnly,
+                                          CurrencyInputFormatter(),
                                         ],
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
+                                          hintText: '0',
                                         ),
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 24,
                                           fontWeight: FontWeight.w900,
                                           color: isDark ? Colors.white : const Color(0xFF1E293B),
                                         ),
@@ -491,7 +529,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                               return GestureDetector(
                                 onTap: () {
                                   final catProv = Provider.of<CategoryProvider>(context, listen: false);
-                                  Navigator.pushNamed(context, AppRoutes.categories).then((_) {
+                                  context.push(AppRouter.categories).then((_) {
                                     if (_userId != null) {
                                       catProv.loadCategories(_userId!);
                                     }
@@ -508,7 +546,7 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.chevron_right_rounded,
+                                        IconlyLight.arrow_right_2,
                                         size: 24,
                                         color: Color(0xFF94A3B8),
                                       ),
@@ -594,14 +632,14 @@ class _TransactionInputViewState extends State<TransactionInputView> {
                               borderRadius: BorderRadius.circular(28),
                             ),
                             elevation: 0,
-                          ),
-                          child: Text(
-                            _activeTab == 'expense' ? 'Nhập khoản chi' : 'Nhập khoản thu',
-                            style: const TextStyle(
+                            textStyle: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                             ),
+                          ),
+                          child: Text(
+                            _activeTab == 'expense' ? 'Nhập khoản chi' : 'Nhập khoản thu',
                           ),
                         ),
                       ],
