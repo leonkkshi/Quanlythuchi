@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../category/presentation/views/budget_view.dart';
 import '../../../reports/presentation/pages/reports_page.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
@@ -43,16 +44,16 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = Colors.orange[800] ?? Colors.orange;
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceCardDark : AppColors.canvasLight,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(isDark ? 0.28 : 0.06),
+              blurRadius: 18,
               offset: const Offset(0, -2),
             ),
           ],
@@ -65,11 +66,9 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             });
           },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
-          selectedItemColor: primaryColor,
-          unselectedItemColor: isDark
-              ? const Color(0xFF64748B)
-              : const Color(0xFF94A3B8),
+          backgroundColor: isDark ? AppColors.surfaceCardDark : AppColors.canvasLight,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: isDark ? AppColors.mutedStrong : AppColors.mutedStrong,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,

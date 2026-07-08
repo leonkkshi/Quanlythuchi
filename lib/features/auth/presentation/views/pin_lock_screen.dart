@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app/routes/app_router.dart';
+import '../../../../core/theme/app_theme.dart';
 
 class PinLockScreen extends StatefulWidget {
   const PinLockScreen({super.key});
@@ -62,9 +63,14 @@ class _PinLockScreenState extends State<PinLockScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final accent = AppColors.primary;
+    final background = isDark ? AppColors.canvasDark : AppColors.canvasLight;
+    final onBackground = theme.colorScheme.onBackground;
+    final muted = AppColors.mutedStrong;
+    final errorColor = AppColors.tradingDown;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: background,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -73,47 +79,40 @@ class _PinLockScreenState extends State<PinLockScreen> {
             Icon(
               Icons.lock_rounded,
               size: 64,
-              color: Colors.orange[800] ?? Colors.orange,
+              color: accent,
             ),
             const SizedBox(height: 24),
             Text(
               'Nhập mã PIN mở khóa',
-              style: TextStyle(
-                fontSize: 22,
+              style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: onBackground,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Để truy cập ứng dụng Quản lý Thu Chi',
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? const Color(0xFF64748B) : const Color(0xFF475569),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: muted,
               ),
             ),
             const SizedBox(height: 40),
-            // Passcode Dots
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(4, (index) {
                 final filled = index < _pin.length;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _isWrong
-                          ? Colors.red
-                          : (Colors.orange[800] ?? Colors.orange),
+                      color: _isWrong ? errorColor : accent,
                       width: 2,
                     ),
-                    color: filled
-                        ? (_isWrong ? Colors.red : (Colors.orange[800] ?? Colors.orange))
-                        : Colors.transparent,
+                    color: filled ? (_isWrong ? errorColor : accent) : Colors.transparent,
                   ),
                 );
               }),
@@ -122,10 +121,12 @@ class _PinLockScreenState extends State<PinLockScreen> {
             if (_errorMessage.isNotEmpty)
               Text(
                 _errorMessage,
-                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: errorColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             const Spacer(),
-            // Numeric Keypad
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
@@ -135,7 +136,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(3, (index) {
                         final val = i * 3 + index + 1;
-                        return _buildKey(val, isDark);
+                        return _buildKey(val, theme);
                       }),
                     ),
                     const SizedBox(height: 16),
@@ -143,10 +144,9 @@ class _PinLockScreenState extends State<PinLockScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Empty placeholder
                       const SizedBox(width: 72, height: 72),
-                      _buildKey(0, isDark),
-                      _buildDeleteKey(isDark),
+                      _buildKey(0, theme),
+                      _buildDeleteKey(theme),
                     ],
                   ),
                 ],
@@ -159,7 +159,9 @@ class _PinLockScreenState extends State<PinLockScreen> {
     );
   }
 
-  Widget _buildKey(int value, bool isDark) {
+  Widget _buildKey(int value, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       width: 72,
       height: 72,
@@ -167,25 +169,25 @@ class _PinLockScreenState extends State<PinLockScreen> {
         style: OutlinedButton.styleFrom(
           shape: const CircleBorder(),
           side: BorderSide(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? AppColors.hairlineOnDark : AppColors.hairlineOnLight,
             width: 1.5,
           ),
-          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          backgroundColor: theme.colorScheme.surface,
         ),
         onPressed: () => _onKeyPress(value),
         child: Text(
           '$value',
-          style: TextStyle(
+          style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDeleteKey(bool isDark) {
+  Widget _buildDeleteKey(ThemeData theme) {
     return SizedBox(
       width: 72,
       height: 72,
@@ -193,7 +195,7 @@ class _PinLockScreenState extends State<PinLockScreen> {
         icon: Icon(
           Icons.backspace_outlined,
           size: 26,
-          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+          color: theme.colorScheme.onSurface.withOpacity(0.72),
         ),
         onPressed: _onDelete,
       ),
