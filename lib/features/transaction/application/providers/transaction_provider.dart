@@ -7,6 +7,7 @@ class TransactionProvider extends ChangeNotifier {
   List<TransactionModel> _filteredTransactions = [];
   bool _isLoading = false;
   String? _errorMessage;
+  String? _lastUserId;
 
   List<TransactionModel> get transactions =>
       _filteredTransactions.isEmpty ? _transactions : _filteredTransactions;
@@ -19,6 +20,7 @@ class TransactionProvider extends ChangeNotifier {
   }
 
   Future<void> loadTransactions(String userId) async {
+    _lastUserId = userId;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -38,6 +40,12 @@ class TransactionProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Reload lại với userId lần trước (dùng khi chuyển tab).
+  Future<void> refresh() async {
+    if (_lastUserId == null) return;
+    await loadTransactions(_lastUserId!);
   }
 
   Future<bool> addTransaction({

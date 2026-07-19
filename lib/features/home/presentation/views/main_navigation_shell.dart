@@ -3,10 +3,13 @@ import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../category/application/providers/budget_provider.dart';
+import '../../../category/application/providers/category_provider.dart';
 import '../../../category/presentation/views/budget_view.dart';
 import '../../../reports/application/providers/report_provider.dart';
 import '../../../reports/presentation/pages/reports_page.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
+import '../../../transaction/application/providers/transaction_provider.dart';
 import '../../../transaction/presentation/views/transaction_calendar_view.dart';
 import '../../../transaction/presentation/views/transaction_input_view.dart';
 import 'home_page.dart';
@@ -70,6 +73,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
             // Tự động reload báo cáo khi chuyển sang tab Báo cáo (index 3)
             if (index == 3) {
               Provider.of<ReportProvider>(context, listen: false).refresh();
+            }
+            // Tự động reload ngân sách khi chuyển sang tab Ngân sách (index 4)
+            if (index == 4) {
+              Provider.of<BudgetProvider>(context, listen: false).refresh();
+              Provider.of<CategoryProvider>(context, listen: false).refresh();
+              Provider.of<TransactionProvider>(context, listen: false).refresh();
             }
           },
           type: BottomNavigationBarType.fixed,
