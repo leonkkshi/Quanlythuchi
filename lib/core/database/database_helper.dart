@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -196,16 +196,21 @@ class DatabaseHelper {
         )
       ''');
     }
+    if (oldVersion < 6) {
+      // Sửa lại icon_code: từ Material Icons sang Iconly Light
+      await db.delete('categories');
+      await _seedDefaultCategories(db, 'u-001');
+    }
   }
 
   Future<void> _seedDefaultCategories(Database db, String userId) async {
     final List<Map<String, dynamic>> defaultCategories = [
-      // Expenses
+      // === CHI TIÊU ===
       {
         'id': 'cat_expense_food_$userId',
         'name': 'Ăn uống',
         'type': 'expense',
-        'icon_code': 0xe532, // restaurant
+        'icon_code': 0xe919, // IconlyLight.buy
         'color_hex': '#FF9800',
         'user_id': userId,
       },
@@ -213,7 +218,7 @@ class DatabaseHelper {
         'id': 'cat_expense_daily_$userId',
         'name': 'Chi tiêu hàng ngày',
         'type': 'expense',
-        'icon_code': 0xe547, // local_grocery_store
+        'icon_code': 0xe916, // IconlyLight.bag
         'color_hex': '#4CAF50',
         'user_id': userId,
       },
@@ -221,7 +226,7 @@ class DatabaseHelper {
         'id': 'cat_expense_clothes_$userId',
         'name': 'Quần áo',
         'type': 'expense',
-        'icon_code': 0xf581, // checkroom
+        'icon_code': 0xe955, // IconlyLight.ticket_star
         'color_hex': '#2196F3',
         'user_id': userId,
       },
@@ -229,7 +234,7 @@ class DatabaseHelper {
         'id': 'cat_expense_cosmetics_$userId',
         'name': 'Mỹ phẩm',
         'type': 'expense',
-        'icon_code': 0xea8a, // spa
+        'icon_code': 0xe931, // IconlyLight.heart
         'color_hex': '#E91E63',
         'user_id': userId,
       },
@@ -237,7 +242,7 @@ class DatabaseHelper {
         'id': 'cat_expense_social_$userId',
         'name': 'Phí giao lưu',
         'type': 'expense',
-        'icon_code': 0xe540, // local_bar
+        'icon_code': 0xe922, // IconlyLight.chat
         'color_hex': '#9C27B0',
         'user_id': userId,
       },
@@ -245,7 +250,7 @@ class DatabaseHelper {
         'id': 'cat_expense_health_$userId',
         'name': 'Y tế',
         'type': 'expense',
-        'icon_code': 0xe548, // local_hospital
+        'icon_code': 0xe900, // IconlyLight.activity
         'color_hex': '#00BCD4',
         'user_id': userId,
       },
@@ -253,7 +258,7 @@ class DatabaseHelper {
         'id': 'cat_expense_edu_$userId',
         'name': 'Giáo dục',
         'type': 'expense',
-        'icon_code': 0xe80c, // school
+        'icon_code': 0xe928, // IconlyLight.document
         'color_hex': '#FF5722',
         'user_id': userId,
       },
@@ -261,7 +266,7 @@ class DatabaseHelper {
         'id': 'cat_expense_elec_$userId',
         'name': 'Tiền điện',
         'type': 'expense',
-        'icon_code': 0xe90f, // lightbulb_outline
+        'icon_code': 0xe956, // IconlyLight.time_circle
         'color_hex': '#FFEB3B',
         'user_id': userId,
       },
@@ -269,7 +274,7 @@ class DatabaseHelper {
         'id': 'cat_expense_transit_$userId',
         'name': 'Đi lại',
         'type': 'expense',
-        'icon_code': 0xe531, // directions_car
+        'icon_code': 0xe94c, // IconlyLight.send
         'color_hex': '#607D8B',
         'user_id': userId,
       },
@@ -277,7 +282,7 @@ class DatabaseHelper {
         'id': 'cat_expense_comm_$userId',
         'name': 'Phí liên lạc',
         'type': 'expense',
-        'icon_code': 0xe2cd, // phone_android
+        'icon_code': 0xe91b, // IconlyLight.call
         'color_hex': '#795548',
         'user_id': userId,
       },
@@ -285,16 +290,16 @@ class DatabaseHelper {
         'id': 'cat_expense_rent_$userId',
         'name': 'Tiền nhà',
         'type': 'expense',
-        'icon_code': 0xe88a, // home
+        'icon_code': 0xe933, // IconlyLight.home
         'color_hex': '#3F51B5',
         'user_id': userId,
       },
-      // Incomes
+      // === THU NHẬP ===
       {
         'id': 'cat_income_salary_$userId',
         'name': 'Lương',
         'type': 'income',
-        'icon_code': 0xe227, // attach_money
+        'icon_code': 0xe962, // IconlyLight.wallet
         'color_hex': '#4CAF50',
         'user_id': userId,
       },
@@ -302,7 +307,7 @@ class DatabaseHelper {
         'id': 'cat_income_bonus_$userId',
         'name': 'Phụ thu',
         'type': 'income',
-        'icon_code': 0xe8f1, // card_giftcard
+        'icon_code': 0xe930, // IconlyLight.graph
         'color_hex': '#FFC107',
         'user_id': userId,
       },
@@ -310,7 +315,7 @@ class DatabaseHelper {
         'id': 'cat_income_invest_$userId',
         'name': 'Đầu tư',
         'type': 'income',
-        'icon_code': 0xe6e1, // show_chart
+        'icon_code': 0xe921, // IconlyLight.chart
         'color_hex': '#009688',
         'user_id': userId,
       },
@@ -318,7 +323,7 @@ class DatabaseHelper {
         'id': 'cat_income_other_$userId',
         'name': 'Khác',
         'type': 'income',
-        'icon_code': 0xe5d2, // more_horiz
+        'icon_code': 0xe951, // IconlyLight.star
         'color_hex': '#9E9E9E',
         'user_id': userId,
       },
