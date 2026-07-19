@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/routes/app_router.dart';
+import '../../../category/application/providers/budget_provider.dart';
 import '../../../category/application/providers/category_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../application/providers/transaction_provider.dart';
@@ -202,6 +203,13 @@ class _TransactionInputViewState extends State<TransactionInputView> {
       return;
     }
 
+    // Kiểm tra ngân sách khi là giao dịch CHI
+    if (_activeTab == 'expense') {
+      final shouldProceed = await _checkBudgetAndConfirm(amount);
+      if (!shouldProceed) return;
+    }
+
+    if (!mounted) return;
     final txProvider = Provider.of<TransactionProvider>(context, listen: false);
     final success = await txProvider.addTransaction(
       amount: amount,
@@ -225,6 +233,178 @@ class _TransactionInputViewState extends State<TransactionInputView> {
       _noteController.clear();
       _amountController.text = '0';
     }
+  }
+
+  /// Kiểm tra ngân sách và hiện dialog xác nhận nếu vượt mức.
+  /// Trả về true nếu nên tiếp tục lưu, false nếu hủy.
+  Future<bool> _checkBudgetAndConfirm(double newAmount) async {
+    final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
+    final txProvider = Provider.of<TransactionProvider>(context, listen: false);
+
+    final period =
+        '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}';
+
+    // Tính tổng đã chi trong tháng cho danh mục này
+    final spent = txProvider.transactions
+        .where((tx) =>
+            tx.type == 'expense' &&
+            tx.categoryId == _selectedCategory!.id &&
+            tx.date.startsWith(period))
+        .fold<double>(0, (sum, tx) => sum + tx.amount);
+
+    // Lấy ngân sách của danh mục
+    final catBudget = budgetProvider.budgets
+        .where((b) => b.categoryId == _selectedCategory!.id)
+        .fold<double>(0, (_, b) => b.amount);
+
+    // Lấy tổng ngân sách chung
+    final totalBudget = budgetProvider.budgets
+        .where((b) => b.categoryId == 'total')
+        .fold<double>(0, (_, b) => b.amount);
+
+    // Tổng đã chi trong tháng (mọi danh mục)
+    final totalSpent = txProvider.transactions
+        .where((tx) => tx.type == 'expense' && tx.date.startsWith(period))
+        .fold<double>(0, (sum, tx) => sum + tx.amount);
+
+    final catWillExceed = catBudget > 0 && (spent + newAmount) > catBudget;
+    final totalWillExceed = totalBudget > 0 && (totalSpent + newAmount) > totalBudget;
+
+    if (!catWillExceed && !totalWillExceed) return true;
+
+    // Xây dựng nội dung cảnh báo
+    final warnings = <String>[];
+    if (catWillExceed) {
+      final over = (spent + newAmount) - catBudget;
+      warnings.add(
+        '• Danh mục "${_selectedCategory!.name}":\n'
+        '  Ngân sách: ${_fmtCurrency(catBudget)}  |  Đã chi: ${_fmtCurrency(spent)}\n'
+        '  Vượt: ${_fmtCurrency(over)}',
+      );
+    }
+    if (totalWillExceed) {
+      final over = (totalSpent + newAmount) - totalBudget;
+      warnings.add(
+        '• Tổng ngân sách tháng:\n'
+        '  Ngân sách: ${_fmtCurrency(totalBudget)}  |  Đã chi: ${_fmtCurrency(totalSpent)}\n'
+        '  Vượt: ${_fmtCurrency(over)}',
+      );
+    }
+
+    if (!mounted) return false;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          icon: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.warning_amber_rounded,
+                color: Colors.redAccent, size: 36),
+          ),
+          title: const Text(
+            'Vượt ngân sách!',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Khoản chi này sẽ vượt giới hạn ngân sách:',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.red.withValues(alpha: 0.08)
+                      : Colors.red.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.redAccent.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Text(
+                  warnings.join('\n\n'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.6,
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Bạn có muốn tiếp tục ghi khoản chi này không?',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                ),
+              ),
+            ],
+          ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.grey),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Hủy',
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Vẫn ghi',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+
+    return confirmed ?? false;
+  }
+
+  String _fmtCurrency(double value) {
+    final n = value.toInt();
+    final buffer = StringBuffer();
+    final str = n.abs().toString();
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      buffer.write(str[i]);
+      count++;
+      if (count % 3 == 0 && i != 0) buffer.write('.');
+    }
+    return '${value < 0 ? "-" : ""}${buffer.toString().split('').reversed.join()}đ';
   }
 
   @override
