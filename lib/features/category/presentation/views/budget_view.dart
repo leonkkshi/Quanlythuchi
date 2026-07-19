@@ -322,6 +322,19 @@ class _BudgetViewState extends State<BudgetView> {
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   children: [
+                    // Banner gợi ý đặt ngân sách khi chưa có ngân sách nào
+                    if (budgets.isEmpty)
+                      _NoBudgetBanner(
+                        isDark: isDark,
+                        primaryColor: primaryColor,
+                        onSetBudget: () => _showSetBudgetDialog(
+                          context,
+                          categoryId: 'total',
+                          categoryName: 'Tổng ngân sách',
+                          currentAmount: 0,
+                        ),
+                      ),
+
                     // Total Budget Item
                     Container(
                       margin: const EdgeInsets.only(bottom: 24),
@@ -544,6 +557,114 @@ class _BudgetViewState extends State<BudgetView> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Banner gợi ý đặt ngân sách khi chưa có ngân sách nào được thiết lập.
+class _NoBudgetBanner extends StatelessWidget {
+  final bool isDark;
+  final Color primaryColor;
+  final VoidCallback onSetBudget;
+
+  const _NoBudgetBanner({
+    required this.isDark,
+    required this.primaryColor,
+    required this.onSetBudget,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.orange[800]!.withValues(alpha: 0.15),
+            Colors.orange[400]!.withValues(alpha: 0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.orange[700]!.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.orange[700]!.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.lightbulb_outline_rounded,
+                  color: Colors.orange[700],
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Bạn chưa đặt ngân sách!',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.orange[300] : Colors.orange[800],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Đặt ngân sách giúp bạn kiểm soát chi tiêu, tránh lãng phí và đạt mục tiêu tài chính nhanh hơn.',
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.5,
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '💡 Gợi ý: Ngân sách hợp lý thường theo quy tắc 50/30/20 — 50% nhu cầu thiết yếu, 30% giải trí, 20% tiết kiệm.',
+            style: TextStyle(
+              fontSize: 12,
+              height: 1.5,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange[800],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              onPressed: onSetBudget,
+              icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+              label: const Text(
+                'Đặt ngân sách ngay',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
