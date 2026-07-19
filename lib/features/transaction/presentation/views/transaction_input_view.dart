@@ -270,6 +270,107 @@ class _TransactionInputViewState extends State<TransactionInputView> {
     final catWillExceed = catBudget > 0 && (spent + newAmount) > catBudget;
     final totalWillExceed = totalBudget > 0 && (totalSpent + newAmount) > totalBudget;
 
+    // ── TRƯỜNG HỢP 1: Chưa đặt ngân sách nào ─────────────────────────────────
+    final noBudgetAtAll = catBudget <= 0 && totalBudget <= 0;
+    if (noBudgetAtAll) {
+      if (!mounted) return false;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) {
+          final isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            icon: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.account_balance_wallet_outlined,
+                color: Colors.orange[700],
+                size: 36,
+              ),
+            ),
+            title: const Text(
+              'Chưa có ngân sách!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Bạn chưa thiết lập ngân sách chi tiêu cho tháng này.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.orange.withValues(alpha: 0.08)
+                        : Colors.orange.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '💡 Đặt ngân sách giúp bạn kiểm soát chi tiêu tốt hơn theo quy tắc 50/30/20.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.5,
+                      color: isDark ? Colors.orange[300] : Colors.orange[800],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actionsAlignment: MainAxisAlignment.spaceEvenly,
+            actions: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.orange[300]!),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: Text(
+                  'Bỏ qua',
+                  style: TextStyle(
+                      color: Colors.orange[700], fontWeight: FontWeight.bold),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange[700],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text(
+                  'Đặt ngân sách',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      return confirmed ?? true;
+    }
+
+    // ── TRƯỜNG HỢP 2: Không vượt ngân sách ───────────────────────────────────
     if (!catWillExceed && !totalWillExceed) return true;
 
     // Xây dựng nội dung cảnh báo
