@@ -4,10 +4,12 @@ import '../../data/models/transaction_model.dart';
 
 class TransactionProvider extends ChangeNotifier {
   List<TransactionModel> _transactions = [];
+  List<TransactionModel> _filteredTransactions = [];
   bool _isLoading = false;
   String? _errorMessage;
 
-  List<TransactionModel> get transactions => _transactions;
+  List<TransactionModel> get transactions =>
+      _filteredTransactions.isEmpty ? _transactions : _filteredTransactions;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -28,6 +30,7 @@ class TransactionProvider extends ChangeNotifier {
       _transactions = rawTxs
           .map((map) => TransactionModel.fromMap(map))
           .toList();
+      _filteredTransactions = [];
     } catch (e) {
       _errorMessage = 'Không thể tải danh sách giao dịch: ${e.toString()}';
       _transactions = [];
@@ -129,5 +132,27 @@ class TransactionProvider extends ChangeNotifier {
     } catch (_) {
       return null;
     }
+  }
+
+  void searchTransactions(String keyword) {
+    if (keyword.trim().isEmpty) {
+      _filteredTransactions = [];
+      notifyListeners();
+      return;
+    }
+
+    final lowerKeyword = keyword.toLowerCase();
+
+    _filteredTransactions = _transactions.where((tx) {
+      return (tx.note ?? '').toLowerCase().contains(lowerKeyword) ||
+          tx.amount.toString().contains(lowerKeyword);
+    }).toList();
+
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _filteredTransactions = [];
+    notifyListeners();
   }
 }

@@ -1,9 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import '../../../../widgets/budget_progress_bar.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import '../../../../features/auth/application/services/auth_service_impl.dart';
 import '../../../transaction/application/providers/transaction_provider.dart';
 import '../../application/providers/category_provider.dart';
 import '../../application/providers/budget_provider.dart';
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    } else if (newValue.text.compareTo(oldValue.text) != 0) {
+      final int selectionIndexFromTheRight =
+          newValue.text.length - newValue.selection.end;
+      final numberString = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+      if (numberString.isEmpty) return newValue.copyWith(text: '');
+      final number = int.parse(numberString);
+      final newString = NumberFormat.decimalPattern('vi_VN').format(number).replaceAll(',', '.');
+      return TextEditingValue(
+        text: newString,
+        selection: TextSelection.collapsed(
+            offset: newString.length - selectionIndexFromTheRight),
+      );
+    } else {
+      return newValue;
+    }
+  }
+}
 
 class BudgetView extends StatefulWidget {
   const BudgetView({super.key});
@@ -56,7 +84,7 @@ class _BudgetViewState extends State<BudgetView> {
   }
 
   IconData _getIconData(int codePoint) {
-    return IconData(codePoint, fontFamily: 'MaterialIcons');
+    return IconData(codePoint, fontFamily: 'IconlyLight', fontPackage: 'iconly');
   }
 
   Color _getColorFromHex(String hexColor) {
@@ -117,13 +145,24 @@ class _BudgetViewState extends State<BudgetView> {
             controller: controller,
             keyboardType: TextInputType.number,
             autofocus: true,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CurrencyInputFormatter(),
+            ],
             decoration: InputDecoration(
               hintText: 'Nhập số tiền hạn mức (đ)',
               suffixText: 'đ',
               fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
             ),
             style: TextStyle(
               color: isDark ? Colors.white : const Color(0xFF1E293B),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
           actions: [
@@ -138,7 +177,7 @@ class _BudgetViewState extends State<BudgetView> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               onPressed: () async {
-                final text = controller.text.trim();
+                final text = controller.text.trim().replaceAll('.', '').replaceAll(',', '');
                 final amount = double.tryParse(text) ?? 0.0;
 
                 final authService = Provider.of<AuthServiceImpl>(context, listen: false);
@@ -218,7 +257,7 @@ class _BudgetViewState extends State<BudgetView> {
             elevation: 0,
             backgroundColor: Colors.transparent,
             leading: IconButton(
-              icon: Icon(Icons.photo_library_outlined, color: primaryColor),
+              icon: Icon(IconlyLight.image, color: primaryColor),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Tính năng lưu hình ảnh đang phát triển.')),
@@ -229,7 +268,7 @@ class _BudgetViewState extends State<BudgetView> {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: Icon(Icons.tune_rounded, color: primaryColor),
+                icon: Icon(IconlyLight.filter, color: primaryColor),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Tính năng lọc đang phát triển.')),
@@ -256,7 +295,7 @@ class _BudgetViewState extends State<BudgetView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_left_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(-1),
                       ),
                       Text(
@@ -268,7 +307,7 @@ class _BudgetViewState extends State<BudgetView> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+                        icon: const Icon(IconlyLight.arrow_right_2, color: Color(0xFF94A3B8)),
                         onPressed: () => _changeTimePeriod(1),
                       ),
                     ],
@@ -284,113 +323,103 @@ class _BudgetViewState extends State<BudgetView> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   children: [
                     // Total Budget Item
-                    InkWell(
-                      onTap: () => _showSetBudgetDialog(
-                        context,
-                        categoryId: 'total',
-                        categoryName: 'Tổng ngân sách',
-                        currentAmount: totalBudgetAmount,
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _showSetBudgetDialog(
+                            context,
+                            categoryId: 'total',
+                            categoryName: 'Tổng ngân sách',
+                            currentAmount: totalBudgetAmount,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Tổng ngân sách',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                  ),
-                                ),
                                 Row(
                                   children: [
-                                    Text(
-                                      totalRemaining == 0 && !totalIsSet
-                                          ? 'Chưa đặt'
-                                          : 'Còn lại: ',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: primaryColor.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(IconlyBold.wallet, color: primaryColor, size: 24),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Tổng ngân sách',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            totalRemaining == 0 && !totalIsSet
+                                                ? 'Chưa đặt'
+                                                : 'Còn lại: ${_formatCurrency(totalRemaining)}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: totalRemaining < 0 ? Colors.redAccent : Colors.green,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    if (totalRemaining != 0 || totalIsSet)
-                                      Text(
-                                        _formatCurrency(totalRemaining),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: totalRemaining < 0 ? Colors.redAccent : Colors.green,
-                                        ),
-                                      ),
-                                    const SizedBox(width: 4),
-                                    const Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: Color(0xFFCBD5E1),
-                                      size: 20,
+                                    const Icon(IconlyLight.arrow_right_2, color: Color(0xFFCBD5E1), size: 20),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                BudgetProgressBar(
+                                  progress: totalProgress,
+                                  percentage: '${totalPercentage.toStringAsFixed(0)} %',
+                                  color: primaryColor,
+                                  isDark: isDark,
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      totalIsSet ? 'NS: ${_formatCurrency(totalBudgetAmount)}' : 'NS: Chưa đặt',
+                                      style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                                    ),
+                                    Text(
+                                      'Chi: ${_formatCurrency(totalExpense)}',
+                                      style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: totalProgress,
-                                      minHeight: 8,
-                                      backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                                      valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '${totalPercentage.toStringAsFixed(0)} %',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  totalIsSet
-                                      ? 'Ngân sách ${_formatCurrency(totalBudgetAmount)}'
-                                      : 'Ngân sách Chưa đặt',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                                Text(
-                                  'Chi tiêu ${_formatCurrency(totalExpense)}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
 
-                    const Divider(height: 24, thickness: 1),
+                    
 
                     // Individual Categories Budgets
                     ...categories.map((cat) {
@@ -412,110 +441,98 @@ class _BudgetViewState extends State<BudgetView> {
 
                       final catColor = _getColorFromHex(cat.colorHex);
 
-                      return InkWell(
-                        onTap: () => _showSetBudgetDialog(
-                          context,
-                          categoryId: cat.id,
-                          categoryName: cat.name,
-                          currentAmount: budgetAmount,
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _showSetBudgetDialog(
+                              context,
+                              categoryId: cat.id,
+                              categoryName: cat.name,
+                              currentAmount: budgetAmount,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    _getIconData(cat.iconCode),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: catColor.withOpacity(0.15),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(_getIconData(cat.iconCode), color: catColor, size: 24),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              cat.name,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              remaining == 0 && !isSet
+                                                  ? 'Chưa đặt'
+                                                  : 'Còn lại: ${_formatCurrency(remaining)}',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: remaining < 0 ? Colors.redAccent : Colors.green,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(IconlyLight.arrow_right_2, color: Color(0xFFCBD5E1), size: 20),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  BudgetProgressBar(
+                                    progress: progress,
+                                    percentage: '${percentage.toStringAsFixed(0)} %',
                                     color: catColor,
-                                    size: 22,
+                                    isDark: isDark,
                                   ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    cat.name,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : const Color(0xFF1E293B),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    remaining == 0 && !isSet
-                                        ? 'Chưa đặt'
-                                        : 'Còn lại: ',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                                    ),
-                                  ),
-                                  if (remaining != 0 || isSet)
-                                    Text(
-                                      _formatCurrency(remaining),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                        color: remaining < 0 ? Colors.redAccent : Colors.green,
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        isSet ? 'NS: ${_formatCurrency(budgetAmount)}' : 'NS: Chưa đặt',
+                                        style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                                       ),
-                                    ),
-                                  const SizedBox(width: 4),
-                                  const Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: Color(0xFFCBD5E1),
-                                    size: 20,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: LinearProgressIndicator(
-                                        value: progress,
-                                        minHeight: 8,
-                                        backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                                        valueColor: AlwaysStoppedAnimation<Color>(catColor),
+                                      Text(
+                                        'Chi: ${_formatCurrency(catExpense)}',
+                                        style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${percentage.toStringAsFixed(0)} %',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 6),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    isSet
-                                        ? 'Ngân sách ${_formatCurrency(budgetAmount)}'
-                                        : 'Ngân sách Chưa đặt',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Chi tiêu ${_formatCurrency(catExpense)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       );
