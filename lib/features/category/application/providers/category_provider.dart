@@ -5,6 +5,7 @@ import '../../data/models/category_model.dart';
 class CategoryProvider extends ChangeNotifier {
   List<CategoryModel> _categories = [];
   bool _isLoading = false;
+  String? _lastUserId;
 
   List<CategoryModel> get categories => _categories;
   bool get isLoading => _isLoading;
@@ -16,6 +17,7 @@ class CategoryProvider extends ChangeNotifier {
       _categories.where((cat) => cat.type == 'income').toList();
 
   Future<void> loadCategories(String userId) async {
+    _lastUserId = userId;
     _isLoading = true;
     notifyListeners();
 
@@ -28,6 +30,12 @@ class CategoryProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Reload lại với userId lần trước (dùng khi chuyển tab).
+  Future<void> refresh() async {
+    if (_lastUserId == null) return;
+    await loadCategories(_lastUserId!);
   }
 
   Future<bool> addCategory({

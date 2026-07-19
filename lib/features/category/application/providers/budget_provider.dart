@@ -6,11 +6,15 @@ import '../../data/models/budget_model.dart';
 class BudgetProvider extends ChangeNotifier {
   List<BudgetModel> _budgets = [];
   bool _isLoading = false;
+  String? _lastUserId;
+  String? _lastPeriod;
 
   List<BudgetModel> get budgets => _budgets;
   bool get isLoading => _isLoading;
 
   Future<void> loadBudgets(String userId, String period) async {
+    _lastUserId = userId;
+    _lastPeriod = period;
     _isLoading = true;
     notifyListeners();
 
@@ -29,6 +33,12 @@ class BudgetProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Reload lại với userId và period lần trước (dùng khi chuyển tab).
+  Future<void> refresh() async {
+    if (_lastUserId == null || _lastPeriod == null) return;
+    await loadBudgets(_lastUserId!, _lastPeriod!);
   }
 
   Future<void> setBudget({
